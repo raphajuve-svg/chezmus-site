@@ -77,15 +77,31 @@ function Divider({light=false}){
   );
 }
 
-function SectionTitle({children,sub,light=false}){
+function SectionTitle({children,sub,light=false,style}){
   return(
-    <div style={{textAlign:"center",marginBottom:"clamp(36px,5vw,52px)"}}>
+    <div style={{textAlign:"center",marginBottom:"clamp(36px,5vw,52px)",...style}}>
       <Divider light={light}/>
       <h2 className="f-west" style={{fontSize:"clamp(1.55rem,3.5vw,2.4rem)",color:light?C.cream:C.brown,letterSpacing:".015em",margin:"12px 0 5px",lineHeight:1.1}}>
         {children}
       </h2>
       {sub&&<p style={{fontFamily:"'Outfit',sans-serif",fontSize:".75rem",color:light?"rgba(245,239,224,.5)":C.light,letterSpacing:".12em",textTransform:"uppercase",marginTop:5}}>{sub}</p>}
       <Divider light={light}/>
+    </div>
+  );
+}
+
+function AtmosphericTitle({children,sub,light=false,position="center"}){
+  return(
+    <div className={`atmos-title${light?" atmos-title-light":""}`}>
+      <div
+        className="atmos-title-bg"
+        style={{backgroundImage:`url("${westernSectionBackground}")`,backgroundPosition:position}}
+        aria-hidden="true"
+      />
+      <div className="atmos-title-overlay" aria-hidden="true"/>
+      <div className="atmos-title-content">
+        <SectionTitle sub={sub} light={light} style={{marginBottom:0}}>{children}</SectionTitle>
+      </div>
     </div>
   );
 }
@@ -150,11 +166,6 @@ function Hero(){
   return(
     <section id="accueil" style={{paddingTop:64}}>
       <div className="hero-shell">
-        <div
-          className="hero-parchment"
-          style={{backgroundImage:`url("${westernSectionBackground}")`}}
-          aria-hidden="true"
-        />
         <div
           className="hero-food-scene"
           style={{backgroundImage:'url("/images/home-food-hero.png")'}}
@@ -222,14 +233,8 @@ function FeaturedCard({item}){
 function FeaturedSection(){
   return(
     <section className="sp featured-section">
-      <div
-        className="featured-western-bg"
-        style={{backgroundImage:`url("${westernSectionBackground}")`}}
-        aria-hidden="true"
-      />
-      <div className="featured-western-overlay" aria-hidden="true"/>
-      <div className="inner featured-section-content">
-        <SectionTitle sub="burgers &amp; kebab">Nos Incontournables</SectionTitle>
+      <div className="inner">
+        <AtmosphericTitle sub="burgers &amp; kebab" position="right center">Nos Incontournables</AtmosphericTitle>
         <div className="fg">
           {FEATURED.map(f=><FeaturedCard key={f.key} item={f}/>)}
         </div>
@@ -344,13 +349,17 @@ function MenuSection(){
 /* ── STUDENT SECTION ─────────────────────────────────────────────── */
 function StudentSection(){
   return(
-    <section id="etudiant" style={{background:C.dark}} className="sp">
+    <section id="etudiant" className="sp student-section">
       <div className="inner">
+        <AtmosphericTitle
+          light
+          sub="Disponible du lundi au vendredi · Jours scolaires"
+          position="right center"
+        >
+          Menu Étudiant
+        </AtmosphericTitle>
         <div className="student-layout">
           <div className="student-copy">
-            <p className="student-kicker">Disponible du lundi au vendredi</p>
-            <h2 className="f-west">Menu Étudiant</h2>
-            <div className="student-rule"/>
             <p className="student-lead">
               Un burger menu ou un dürüm kebab, accompagné de frites et d’une canette offerte.
             </p>
@@ -379,9 +388,14 @@ function StudentSection(){
 
 function GallerySection(){
   return(
-    <section id="galerie" style={{background:C.cream}} className="sp">
+    <section id="galerie" className="sp gallery-section">
       <div className="inner">
-        <SectionTitle sub="Burgers généreux, kebabs grillés et menus servis chez Chez Mus.">Galerie</SectionTitle>
+        <AtmosphericTitle
+          sub="Burgers généreux, kebabs grillés et menus servis chez Chez Mus."
+          position="right center"
+        >
+          Galerie
+        </AtmosphericTitle>
         <div className="gallery-grid">
           {GALLERY.map((item,index)=>(
             <figure key={item.alt} className={`gallery-card gallery-card-${index+1}`}>
@@ -521,6 +535,7 @@ html{scroll-behavior:smooth;}
 body{min-width:320px;background:#F5EFE0;font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;color:#3D1A00;}
 #root,.App{width:100%;min-height:100%;max-width:none!important;margin:0!important;padding:0!important;border:none!important;background:#F5EFE0;}
 main,section,header,footer{width:100%;}
+section[id]{scroll-margin-top:76px;}
 img{max-width:100%;}
 a{text-decoration:none;}
 
@@ -548,13 +563,6 @@ a{text-decoration:none;}
   content:"";position:absolute;inset:15px;z-index:5;pointer-events:none;
   border:1px solid rgba(61,26,0,.34);border-radius:18px;
   box-shadow:inset 0 0 0 1px rgba(245,239,224,.22);
-}
-.hero-parchment{
-  position:absolute;inset:0 auto 0 0;z-index:3;width:64%;pointer-events:none;
-  background-size:cover;background-position:center;background-repeat:no-repeat;
-  opacity:.16;filter:saturate(.75) sepia(.2);
-  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 72%,transparent 100%);
-  mask-image:linear-gradient(90deg,#000 0%,#000 72%,transparent 100%);
 }
 .hero-food-scene{
   position:absolute;inset:0;z-index:1;
@@ -724,17 +732,33 @@ a{text-decoration:none;}
 .tab:hover:not(.active){color:#3D1A00;}
 
 /* ── Cards grid ── */
-.featured-section{position:relative;overflow:hidden;background:#F5EFE0;}
-.featured-western-bg{
-  position:absolute;inset:0;z-index:0;pointer-events:none;
-  background-size:cover;background-position:center;background-repeat:no-repeat;
-  opacity:.13;
+.featured-section,.gallery-section{background:#F5EFE0;}
+.student-section{background:#1B0B04;}
+.atmos-title{
+  position:relative;isolation:isolate;overflow:hidden;
+  margin-bottom:clamp(34px,4.5vw,50px);
+  padding:clamp(24px,3.4vw,36px) clamp(18px,4vw,48px);
+  border-top:1px solid rgba(105,58,31,.25);
+  border-bottom:1px solid rgba(105,58,31,.25);
+  border-radius:10px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.48);
 }
-.featured-western-overlay{
-  position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:rgba(245,239,224,.64);
+.atmos-title-bg{
+  position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background-size:cover;background-repeat:no-repeat;
+  opacity:.11;filter:saturate(.78) sepia(.12);
 }
-.featured-section-content{position:relative;z-index:2;}
+.atmos-title-overlay{
+  position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:rgba(245,239,224,.76);
+}
+.atmos-title-content{position:relative;z-index:1;max-width:900px;margin:0 auto;}
+.atmos-title-light{
+  border-color:rgba(221,174,104,.25);
+  box-shadow:inset 0 1px 0 rgba(255,237,205,.08);
+}
+.atmos-title-light .atmos-title-bg{opacity:.1;filter:sepia(.4) saturate(.9) brightness(.72);}
+.atmos-title-light .atmos-title-overlay{background:rgba(27,11,4,.82);}
 .fg{display:grid;grid-template-columns:1fr;gap:18px;}
 .featured-image{height:clamp(210px,60vw,300px);}
 .mc{display:grid;grid-template-columns:1fr;gap:0;}
@@ -774,8 +798,11 @@ a{text-decoration:none;}
   .featured-image{height:190px;}
 }
 @media(max-width:640px){
-  .featured-western-bg{background-position:60% center;opacity:.11;}
-  .featured-western-overlay{background:rgba(245,239,224,.7);}
+  .atmos-title{margin-bottom:30px;padding:22px 14px;border-radius:8px;}
+  .atmos-title-bg{opacity:.075;}
+  .atmos-title-overlay{background:rgba(245,239,224,.82);}
+  .atmos-title-light .atmos-title-bg{opacity:.07;}
+  .atmos-title-light .atmos-title-overlay{background:rgba(27,11,4,.87);}
   footer>div{justify-content:center!important;text-align:center;}
   .footer-address{flex-basis:100%;}
   .student-offers{grid-template-columns:1fr;}
@@ -807,11 +834,6 @@ a{text-decoration:none;}
 @media(max-width:560px){
   .hero-shell{border-bottom-width:6px;}
   .hero-shell::after{inset:8px;border-radius:12px;}
-  .hero-parchment{
-    z-index:3;width:100%;height:55%;opacity:.14;background-position:42% center;
-    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%);
-    mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%);
-  }
   .hero-grid{padding:44px 20px 30px;}
   .hero-copy h1{font-size:clamp(2.15rem,10.8vw,3.05rem);line-height:1.08;}
   .hero-location{font-size:.66rem;letter-spacing:.13em;gap:8px;margin-bottom:18px;}
