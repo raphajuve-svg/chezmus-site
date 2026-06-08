@@ -150,31 +150,30 @@ function Hero(){
   return(
     <section id="accueil" style={{paddingTop:64}}>
       <div className="hero-shell">
-        <div className="hero-texture" aria-hidden="true"/>
-        <div style={{position:"relative",zIndex:2,width:"100%"}}>
-          <div className="hero-grid">
-            <div className="hero-copy">
-              <p className="hero-location">Herstal · 100% Halal · Since 2026</p>
-              <h1 className="f-west">Des burgers généreux et des kebabs grillés <span>à Herstal</span></h1>
-              <p className="hero-description">
-                Chez Mus réunit burgers bien garnis, kebabs grillés et menus étudiants dans un spot local à l’identité western.
-              </p>
-              <div className="hero-actions">
-                <a href="#menu" className="btn-orange">Voir le menu</a>
-                <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer" className="btn-outline-dark">Itinéraire</a>
-                <a href="#etudiant" className="hero-student-link">Menu étudiant <span aria-hidden="true">→</span></a>
-              </div>
-              <div className="hero-rule" aria-hidden="true"><span>★</span></div>
+        <div
+          className="hero-parchment"
+          style={{backgroundImage:`url("${westernSectionBackground}")`}}
+          aria-hidden="true"
+        />
+        <div
+          className="hero-food-scene"
+          style={{backgroundImage:'url("/images/home-food-hero.png")'}}
+          role="img"
+          aria-label="Burger, dürüm kebab et frites Chez Mus"
+        />
+        <div className="hero-scene-wash" aria-hidden="true"/>
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <p className="hero-location">Herstal · 100% Halal · Depuis 2022</p>
+            <h1 className="f-west">Des burgers généreux et des kebabs <span>grillés à Herstal</span></h1>
+            <p className="hero-description">
+              Chez Mus réunit burgers bien garnis, kebabs grillés et menus étudiants dans un spot local à l’identité western.
+            </p>
+            <div className="hero-actions">
+              <a href="#menu" className="btn-orange">Voir le menu <span aria-hidden="true">→</span></a>
+              <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer" className="btn-outline-dark">Itinéraire</a>
             </div>
-            <div className="hero-food-card">
-              <div className="hero-food-frame">
-                <img
-                  src="/images/home-food-hero.png"
-                  alt="Burger, dürüm kebab et frites Chez Mus"
-                  fetchPriority="high"
-                />
-              </div>
-            </div>
+            <a href="#etudiant" className="hero-student-link">Menu étudiant <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
@@ -398,8 +397,14 @@ function GallerySection(){
 /* ── ABOUT ───────────────────────────────────────────────────────── */
 function About(){
   return(
-    <section id="histoire" style={{background:C.paper}} className="sp">
-      <div className="inner">
+    <section id="histoire" className="sp about-section">
+      <div
+        className="about-western-bg"
+        style={{backgroundImage:`url("${westernSectionBackground}")`}}
+        aria-hidden="true"
+      />
+      <div className="about-western-overlay" aria-hidden="true"/>
+      <div className="inner about-section-content">
         <div style={{display:"flex",flexWrap:"wrap",gap:"clamp(32px,5vw,56px)",alignItems:"center"}}>
           <div style={{flex:"1 1 280px",maxWidth:500,borderRadius:10,overflow:"hidden",
             boxShadow:"0 16px 44px rgba(61,26,0,0.18)"}}>
@@ -536,52 +541,60 @@ a{text-decoration:none;}
 
 /* ── Hero ── */
 .hero-shell{
-  position:relative;min-height:clamp(620px,calc(100vh - 64px),820px);display:flex;align-items:center;
-  overflow:hidden;background:#F5EFE0;border-bottom:1px solid rgba(196,146,74,.22);
+  position:relative;min-height:clamp(680px,calc(100vh - 64px),850px);display:flex;align-items:stretch;
+  overflow:hidden;isolation:isolate;background:#C99A63;border-bottom:8px solid #3D1A00;
 }
-.hero-texture{
-  position:absolute;inset:0;pointer-events:none;opacity:.42;
+.hero-shell::after{
+  content:"";position:absolute;inset:15px;z-index:5;pointer-events:none;
+  border:1px solid rgba(61,26,0,.34);border-radius:18px;
+  box-shadow:inset 0 0 0 1px rgba(245,239,224,.22);
+}
+.hero-parchment{
+  position:absolute;inset:0 auto 0 0;z-index:3;width:64%;pointer-events:none;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  opacity:.16;filter:saturate(.75) sepia(.2);
+  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 72%,transparent 100%);
+  mask-image:linear-gradient(90deg,#000 0%,#000 72%,transparent 100%);
+}
+.hero-food-scene{
+  position:absolute;inset:0;z-index:1;
+  background-size:auto 100%;background-position:right center;background-repeat:no-repeat;
+}
+.hero-scene-wash{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
   background:
-    radial-gradient(circle at 14% 18%,rgba(232,112,10,.08),transparent 31%),
-    radial-gradient(circle at 88% 78%,rgba(61,26,0,.07),transparent 29%),
-    repeating-linear-gradient(35deg,rgba(196,146,74,.025) 0 1px,transparent 1px 18px);
+    linear-gradient(90deg,rgba(223,184,132,.98) 0%,rgba(225,188,138,.96) 30%,rgba(222,181,127,.83) 43%,rgba(201,148,91,.28) 58%,rgba(61,26,0,.03) 76%),
+    linear-gradient(180deg,rgba(245,239,224,.13) 0%,transparent 48%,rgba(40,15,2,.28) 100%);
 }
 .hero-grid{
-  max-width:1280px;margin:0 auto;padding:clamp(58px,7vw,88px) clamp(20px,5vw,52px);
-  display:grid;grid-template-columns:minmax(360px,.82fr) minmax(520px,1.18fr);gap:clamp(38px,5vw,72px);align-items:center;
+  position:relative;z-index:4;width:100%;max-width:1320px;min-height:100%;margin:0 auto;
+  padding:clamp(72px,8vw,110px) clamp(34px,7vw,92px);
+  display:flex;align-items:center;
 }
-.hero-copy{max-width:560px;}
+.hero-copy{width:min(48%,590px);text-shadow:0 1px 0 rgba(245,239,224,.2);}
 .hero-location{
-  font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;color:#A86424;
-  letter-spacing:.18em;text-transform:uppercase;margin-bottom:18px;
+  display:flex;align-items:center;gap:12px;
+  font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:800;color:#A54812;
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:22px;
 }
-.hero-copy h1{color:#3D1A00;line-height:1.1;margin-bottom:22px;font-size:clamp(2.45rem,4.45vw,4.15rem);}
-.hero-copy h1 span{color:#E8700A;}
+.hero-location::before{content:"★";font-size:.68rem;color:#7A5235;}
+.hero-copy h1{color:#2A0E02;line-height:1.08;margin-bottom:25px;font-size:clamp(2.75rem,4.9vw,4.65rem);}
+.hero-copy h1 span{color:#E65F05;}
 .hero-description{
-  font-family:'Outfit',sans-serif;color:#69432A;font-size:clamp(.98rem,1.35vw,1.08rem);
-  max-width:530px;margin-bottom:30px;line-height:1.75;
+  font-family:'Outfit',sans-serif;color:#4C2A17;font-size:clamp(.98rem,1.25vw,1.08rem);
+  max-width:500px;margin-bottom:30px;line-height:1.72;font-weight:500;
 }
-.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:24px;}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:22px;}
+.hero-actions .btn-orange,.hero-actions .btn-outline-dark{min-height:52px;}
+.hero-actions .btn-orange span{margin-left:10px;font-size:1rem;transition:transform 180ms cubic-bezier(.23,1,.32,1);}
+.hero-actions .btn-orange:hover span{transform:translateX(3px);}
 .hero-student-link{
-  display:inline-flex;align-items:center;gap:8px;padding:12px 4px;
-  font-family:'Outfit',sans-serif;font-size:.83rem;font-weight:700;color:#3D1A00;
+  display:inline-flex;align-items:center;gap:9px;padding:8px 0 7px;
+  border-bottom:1px solid rgba(122,82,53,.45);
+  font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:750;color:#2A0E02;
 }
-.hero-student-link span{color:#E8700A;transition:transform .2s;}
+.hero-student-link span{color:#E65F05;transition:transform 180ms cubic-bezier(.23,1,.32,1);}
 .hero-student-link:hover span{transform:translateX(3px);}
-.hero-rule{display:flex;align-items:center;gap:12px;width:min(100%,360px);color:#C4924A;}
-.hero-rule::before,.hero-rule::after{content:"";height:1px;flex:1;background:rgba(196,146,74,.55);}
-.hero-rule span{font-size:.72rem;}
-.hero-food-card{
-  position:relative;width:100%;justify-self:end;padding:10px;background:#FBF7EE;
-  border:1px solid #D8C9A8;border-radius:16px;
-  box-shadow:0 25px 65px rgba(61,26,0,.2);transform:rotate(.7deg);
-}
-.hero-food-card::before{
-  content:"";position:absolute;inset:-7px;z-index:-1;border:1px solid rgba(196,146,74,.5);
-  border-radius:20px;transform:rotate(-1.1deg);
-}
-.hero-food-frame{aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#EDE4CE;}
-.hero-food-frame img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
 
 /* ── Student offer ── */
 .student-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);gap:clamp(34px,6vw,72px);align-items:center;}
@@ -659,9 +672,10 @@ a{text-decoration:none;}
   display:inline-flex;align-items:center;
   font-family:'Outfit',sans-serif;font-weight:700;font-size:.875rem;letter-spacing:.04em;
   background:#E8700A;color:#fff;padding:14px 32px;border-radius:8px;
-  border:none;cursor:pointer;transition:background .2s,transform .2s;
+  border:none;cursor:pointer;transition:background 180ms ease,transform 140ms cubic-bezier(.23,1,.32,1);
 }
 .btn-orange:hover{background:#d9620a;transform:translateY(-1px);}
+.btn-orange:active{transform:scale(.97);}
 .btn-ghost{
   display:inline-flex;align-items:center;
   font-family:'Outfit',sans-serif;font-weight:600;font-size:.875rem;letter-spacing:.04em;
@@ -680,9 +694,10 @@ a{text-decoration:none;}
   display:inline-flex;align-items:center;
   font-family:'Outfit',sans-serif;font-weight:600;font-size:.875rem;letter-spacing:.04em;
   background:transparent;color:#3D1A00;padding:13px 28px;border-radius:8px;
-  border:2px solid #3D1A00;cursor:pointer;transition:all .2s;
+  border:2px solid #3D1A00;cursor:pointer;transition:background 180ms ease,color 180ms ease,transform 140ms cubic-bezier(.23,1,.32,1);
 }
 .btn-outline-dark:hover{background:#3D1A00;color:#F5EFE0;}
+.btn-outline-dark:active{transform:scale(.97);}
 
 /* ── Nav ── */
 .desktop-nav{display:none;align-items:center;gap:2px;}
@@ -724,6 +739,16 @@ a{text-decoration:none;}
 .featured-image{height:clamp(210px,60vw,300px);}
 .mc{display:grid;grid-template-columns:1fr;gap:0;}
 
+/* ── About atmosphere ── */
+.about-section{position:relative;overflow:hidden;isolation:isolate;background:#E6CC9F;}
+.about-western-bg{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+  opacity:.14;filter:saturate(.75) sepia(.12);
+}
+.about-western-overlay{position:absolute;inset:0;z-index:1;background:rgba(234,210,168,.72);pointer-events:none;}
+.about-section-content{position:relative;z-index:2;}
+
 /* ── Footer ── */
 .footer-address,.footer-social{
   font-family:'Outfit',sans-serif;font-size:.78rem;color:rgba(245,239,224,.7);
@@ -762,10 +787,17 @@ a{text-decoration:none;}
   .tab{padding:11px 10px;font-size:.73rem;}
 }
 @media(max-width:979px){
-  .hero-shell{min-height:auto;}
-  .hero-grid{grid-template-columns:1fr;padding-top:60px;padding-bottom:72px;}
-  .hero-copy{max-width:680px;}
-  .hero-food-card{width:100%;max-width:760px;justify-self:center;transform:rotate(0);}
+  .hero-shell{min-height:auto;display:flex;flex-direction:column;}
+  .hero-food-scene{
+    position:relative;inset:auto;z-index:1;width:100%;height:min(58vw,520px);
+    order:2;background-size:cover;background-position:57% center;
+  }
+  .hero-scene-wash{
+    background:
+      linear-gradient(180deg,rgba(218,177,123,.98) 0%,rgba(218,177,123,.83) 13%,transparent 34%,transparent 76%,rgba(42,14,2,.3) 100%);
+  }
+  .hero-grid{order:1;min-height:auto;padding-top:62px;padding-bottom:38px;align-items:flex-start;}
+  .hero-copy{width:min(100%,680px);}
   .student-layout{grid-template-columns:1fr;}
   .student-copy{max-width:620px;}
   .student-photo-wrap{max-width:720px;}
@@ -773,14 +805,25 @@ a{text-decoration:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:360px;}
 }
 @media(max-width:560px){
-  .hero-grid{padding-top:42px;padding-bottom:48px;gap:26px;}
-  .hero-copy h1{font-size:clamp(2.12rem,10.5vw,3rem);}
+  .hero-shell{border-bottom-width:6px;}
+  .hero-shell::after{inset:8px;border-radius:12px;}
+  .hero-parchment{
+    z-index:3;width:100%;height:55%;opacity:.14;background-position:42% center;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%);
+    mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%);
+  }
+  .hero-grid{padding:44px 20px 30px;}
+  .hero-copy h1{font-size:clamp(2.15rem,10.8vw,3.05rem);line-height:1.08;}
+  .hero-location{font-size:.66rem;letter-spacing:.13em;gap:8px;margin-bottom:18px;}
+  .hero-description{margin-bottom:24px;line-height:1.65;}
   .hero-actions{align-items:stretch;}
-  .hero-actions .btn-orange,.hero-actions .btn-outline-dark{justify-content:center;flex:1 1 145px;}
-  .hero-student-link{flex-basis:100%;}
-  .hero-food-card{width:100%;}
-  .hero-food-frame{aspect-ratio:1.62/1;}
-  .hero-food-frame img{object-position:57% center;}
+  .hero-actions .btn-orange,.hero-actions .btn-outline-dark{
+    justify-content:center;flex:1 1 145px;padding-left:16px;padding-right:16px;white-space:nowrap;
+  }
+  .hero-food-scene{height:270px;background-position:58% center;}
+  .hero-scene-wash{
+    background:linear-gradient(180deg,rgba(218,177,123,.98) 0%,rgba(218,177,123,.62) 12%,transparent 32%,transparent 78%,rgba(42,14,2,.32) 100%);
+  }
   .student-photo{height:290px;}
   .student-photo-wrap::after{display:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:320px;}
