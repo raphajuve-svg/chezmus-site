@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars -- legacy inline image sources are retained for existing sections */
 import { useState, useEffect } from "react";
 import howdyImage from "./assets/howdy-card.jpg";
 import dermanoImage from "./assets/dermano-card.jpg";
@@ -149,38 +150,29 @@ function Hero(){
   return(
     <section id="accueil" style={{paddingTop:64}}>
       <div className="hero-shell">
-        <div style={{position:"absolute",inset:0,backgroundImage:`url(${HERO})`,backgroundSize:"cover",backgroundPosition:"center 30%",filter:"brightness(0.46) saturate(1.1)"}}/>
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(105deg, rgba(16,5,0,.94) 0%, rgba(38,15,0,.78) 48%, rgba(16,5,0,.3) 100%)"}}/>
+        <div className="hero-texture" aria-hidden="true"/>
         <div style={{position:"relative",zIndex:2,width:"100%"}}>
           <div className="hero-grid">
             <div className="hero-copy">
-              <p className="hero-location">Herstal · 100% Halal · Depuis 2022</p>
-              <h1 className="f-west">
-                Du burger généreux<br/>
-                au <span>kebab grillé</span>
-              </h1>
+              <p className="hero-location">Herstal · 100% Halal · Since 2026</p>
+              <h1 className="f-west">Des burgers généreux et des kebabs grillés <span>à Herstal</span></h1>
               <p className="hero-description">
                 Chez Mus réunit burgers bien garnis, kebabs grillés et menus étudiants dans un spot local à l’identité western.
               </p>
               <div className="hero-actions">
                 <a href="#menu" className="btn-orange">Voir le menu</a>
-                <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer" className="btn-ghost">Itinéraire</a>
+                <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer" className="btn-outline-dark">Itinéraire</a>
                 <a href="#etudiant" className="hero-student-link">Menu étudiant <span aria-hidden="true">→</span></a>
               </div>
-              <p className="hero-proof">
-                Burgers généreux <span>·</span> Kebab grillé <span>·</span> Menus étudiants
-              </p>
+              <div className="hero-rule" aria-hidden="true"><span>★</span></div>
             </div>
             <div className="hero-food-card">
               <div className="hero-food-frame">
-                <img src={heroFoodImage} alt="Burger bacon cheddar Chez Mus" fetchPriority="high" />
-              </div>
-              <div className="hero-food-caption">
-                <div>
-                  <span>Préparé à la commande</span>
-                  <strong>Burgers Chez Mus</strong>
-                </div>
-                <span className="hero-food-star" aria-hidden="true">★</span>
+                <img
+                  src="/images/home-food-hero.png"
+                  alt="Burger, dürüm kebab et frites Chez Mus"
+                  fetchPriority="high"
+                />
               </div>
             </div>
           </div>
@@ -543,43 +535,53 @@ a{text-decoration:none;}
 }
 
 /* ── Hero ── */
-.hero-shell{position:relative;min-height:calc(100vh - 64px);display:flex;align-items:center;overflow:hidden;}
-.hero-grid{
-  max-width:1200px;margin:0 auto;padding:clamp(56px,8vw,92px) clamp(20px,5vw,52px);
-  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(300px,.75fr);gap:clamp(36px,6vw,78px);align-items:center;
+.hero-shell{
+  position:relative;min-height:clamp(620px,calc(100vh - 64px),820px);display:flex;align-items:center;
+  overflow:hidden;background:#F5EFE0;border-bottom:1px solid rgba(196,146,74,.22);
 }
-.hero-copy{max-width:650px;}
+.hero-texture{
+  position:absolute;inset:0;pointer-events:none;opacity:.42;
+  background:
+    radial-gradient(circle at 14% 18%,rgba(232,112,10,.08),transparent 31%),
+    radial-gradient(circle at 88% 78%,rgba(61,26,0,.07),transparent 29%),
+    repeating-linear-gradient(35deg,rgba(196,146,74,.025) 0 1px,transparent 1px 18px);
+}
+.hero-grid{
+  max-width:1280px;margin:0 auto;padding:clamp(58px,7vw,88px) clamp(20px,5vw,52px);
+  display:grid;grid-template-columns:minmax(360px,.82fr) minmax(520px,1.18fr);gap:clamp(38px,5vw,72px);align-items:center;
+}
+.hero-copy{max-width:560px;}
 .hero-location{
-  font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;color:#C4924A;
+  font-family:'Outfit',sans-serif;font-size:.74rem;font-weight:700;color:#A86424;
   letter-spacing:.18em;text-transform:uppercase;margin-bottom:18px;
 }
-.hero-copy h1{color:#F5EFE0;line-height:1.05;margin-bottom:22px;font-size:clamp(2.65rem,5.7vw,4.9rem);}
+.hero-copy h1{color:#3D1A00;line-height:1.1;margin-bottom:22px;font-size:clamp(2.45rem,4.45vw,4.15rem);}
 .hero-copy h1 span{color:#E8700A;}
 .hero-description{
-  font-family:'Outfit',sans-serif;color:rgba(245,239,224,.82);font-size:clamp(.98rem,1.5vw,1.12rem);
+  font-family:'Outfit',sans-serif;color:#69432A;font-size:clamp(.98rem,1.35vw,1.08rem);
   max-width:530px;margin-bottom:30px;line-height:1.75;
 }
-.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:30px;}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:24px;}
 .hero-student-link{
   display:inline-flex;align-items:center;gap:8px;padding:12px 4px;
-  font-family:'Outfit',sans-serif;font-size:.83rem;font-weight:700;color:#F5EFE0;
+  font-family:'Outfit',sans-serif;font-size:.83rem;font-weight:700;color:#3D1A00;
 }
 .hero-student-link span{color:#E8700A;transition:transform .2s;}
 .hero-student-link:hover span{transform:translateX(3px);}
-.hero-proof{font-family:'Outfit',sans-serif;font-size:.78rem;color:rgba(245,239,224,.52);letter-spacing:.045em;}
-.hero-proof span{color:#C4924A;margin:0 8px;}
+.hero-rule{display:flex;align-items:center;gap:12px;width:min(100%,360px);color:#C4924A;}
+.hero-rule::before,.hero-rule::after{content:"";height:1px;flex:1;background:rgba(196,146,74,.55);}
+.hero-rule span{font-size:.72rem;}
 .hero-food-card{
-  width:min(100%,390px);justify-self:end;padding:12px;background:rgba(251,247,238,.94);
-  border:1px solid rgba(216,201,168,.8);border-radius:14px;
-  box-shadow:0 24px 70px rgba(0,0,0,.38);transform:rotate(1.5deg);
+  position:relative;width:100%;justify-self:end;padding:10px;background:#FBF7EE;
+  border:1px solid #D8C9A8;border-radius:16px;
+  box-shadow:0 25px 65px rgba(61,26,0,.2);transform:rotate(.7deg);
 }
-.hero-food-frame{height:clamp(320px,45vw,470px);overflow:hidden;border-radius:9px;background:#EDE4CE;}
-.hero-food-frame img{width:100%;height:100%;object-fit:cover;object-position:center 48%;display:block;}
-.hero-food-caption{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 8px 5px;}
-.hero-food-caption div{display:flex;flex-direction:column;gap:3px;}
-.hero-food-caption span{font-family:'Outfit',sans-serif;font-size:.65rem;color:#7A5235;letter-spacing:.08em;text-transform:uppercase;}
-.hero-food-caption strong{font-family:'Outfit',sans-serif;font-size:.95rem;color:#3D1A00;}
-.hero-food-star{font-size:1rem!important;color:#E8700A!important;}
+.hero-food-card::before{
+  content:"";position:absolute;inset:-7px;z-index:-1;border:1px solid rgba(196,146,74,.5);
+  border-radius:20px;transform:rotate(-1.1deg);
+}
+.hero-food-frame{aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#EDE4CE;}
+.hero-food-frame img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
 
 /* ── Student offer ── */
 .student-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);gap:clamp(34px,6vw,72px);align-items:center;}
@@ -761,10 +763,9 @@ a{text-decoration:none;}
 }
 @media(max-width:979px){
   .hero-shell{min-height:auto;}
-  .hero-grid{grid-template-columns:1fr;padding-top:60px;padding-bottom:68px;}
+  .hero-grid{grid-template-columns:1fr;padding-top:60px;padding-bottom:72px;}
   .hero-copy{max-width:680px;}
-  .hero-food-card{width:min(82vw,420px);justify-self:center;transform:rotate(0);}
-  .hero-food-frame{height:min(105vw,430px);}
+  .hero-food-card{width:100%;max-width:760px;justify-self:center;transform:rotate(0);}
   .student-layout{grid-template-columns:1fr;}
   .student-copy{max-width:620px;}
   .student-photo-wrap{max-width:720px;}
@@ -772,14 +773,14 @@ a{text-decoration:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:360px;}
 }
 @media(max-width:560px){
-  .hero-grid{padding-top:48px;padding-bottom:58px;gap:38px;}
-  .hero-copy h1{font-size:clamp(2.35rem,12vw,3.45rem);}
+  .hero-grid{padding-top:42px;padding-bottom:48px;gap:26px;}
+  .hero-copy h1{font-size:clamp(2.12rem,10.5vw,3rem);}
   .hero-actions{align-items:stretch;}
-  .hero-actions .btn-orange,.hero-actions .btn-ghost{justify-content:center;flex:1 1 145px;}
+  .hero-actions .btn-orange,.hero-actions .btn-outline-dark{justify-content:center;flex:1 1 145px;}
   .hero-student-link{flex-basis:100%;}
-  .hero-proof{line-height:1.7;}
   .hero-food-card{width:100%;}
-  .hero-food-frame{height:370px;}
+  .hero-food-frame{aspect-ratio:1.62/1;}
+  .hero-food-frame img{object-position:57% center;}
   .student-photo{height:290px;}
   .student-photo-wrap::after{display:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:320px;}
