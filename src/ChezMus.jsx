@@ -124,9 +124,9 @@ function SaloonDivider({light=false}){
 
 function SectionTitle({children,sub,light=false,style,align="center",headingStyle}){
   return(
-    <div className={`section-title section-title-${align}`} style={{textAlign:align,marginBottom:"clamp(36px,5vw,52px)",...style}}>
+    <div className={`section-title section-title-${align}`} style={{textAlign:align,marginBottom:"clamp(28px,4vw,42px)",...style}}>
       <SaloonDivider light={light}/>
-      <h2 className="f-west" style={{fontSize:"clamp(1.55rem,3.5vw,2.4rem)",color:light?C.cream:C.brown,letterSpacing:".015em",margin:"12px 0 5px",lineHeight:1.1,...headingStyle}}>
+      <h2 className="f-west" style={{fontSize:"clamp(1.55rem,3.5vw,2.4rem)",color:light?C.cream:C.brown,letterSpacing:".015em",margin:"7px 0 5px",lineHeight:1.1,...headingStyle}}>
         {children}
       </h2>
       {sub&&<p style={{fontFamily:"'Outfit',sans-serif",fontSize:".75rem",color:light?"rgba(245,239,224,.5)":C.light,letterSpacing:".12em",textTransform:"uppercase",marginTop:5}}>{sub}</p>}
@@ -590,7 +590,7 @@ a{text-decoration:none;}
 .inner  {max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,52px);}
 .inner-m{max-width:960px; margin:0 auto;padding:0 clamp(20px,5vw,52px);}
 .inner-s{max-width:640px; margin:0 auto;padding:0 clamp(20px,5vw,52px);}
-.sp     {padding:clamp(64px,8vw,100px) 0;}
+.sp     {padding:clamp(42px,5vw,64px) 0;}
 .hours-note{
   margin:18px 0 22px;padding-top:16px;border-top:1px solid #D8C9A8;
   font-family:'Outfit',sans-serif;font-size:.76rem;color:#7A5235;
@@ -861,44 +861,58 @@ a{text-decoration:none;}
 .featured-section,.student-section,.gallery-section,.about-section{background:#DDB77A;}
 .section-title{position:relative;}
 .western-atmosphere .section-title{
-  padding:14px clamp(14px,3vw,28px) 10px;border-radius:18px;
+  padding:6px clamp(14px,3vw,28px) 8px;border-radius:18px;
   background:radial-gradient(ellipse at center,rgba(255,239,205,.48),rgba(255,239,205,.12) 58%,transparent 76%);
   text-shadow:0 1px 0 rgba(255,240,211,.5);
 }
 .section-title h2{filter:drop-shadow(0 2px 0 rgba(255,237,197,.28));}
 .saloon-divider{
-  width:min(100%,460px);height:26px;margin:0 auto 8px;
-  display:flex;align-items:center;justify-content:center;gap:12px;
-  perspective:500px;pointer-events:none;
+  width:min(100%,480px);height:40px;margin:0 auto 1px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  perspective:700px;pointer-events:none;
 }
-.section-title-left .saloon-divider{width:min(100%,320px);margin-left:0;margin-right:0;}
+.section-title-left .saloon-divider{width:min(100%,360px);margin-left:0;margin-right:0;}
 .saloon-divider-line{height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(105,58,31,.42));}
 .saloon-divider-line:last-child{background:linear-gradient(90deg,rgba(105,58,31,.42),transparent);}
 .saloon-divider.is-light .saloon-divider-line{opacity:.5;filter:brightness(1.7);}
-.saloon-mini-doors{position:relative;display:flex;width:62px;height:24px;justify-content:center;align-items:center;}
+.saloon-mini-doors{position:relative;display:flex;width:116px;height:38px;justify-content:center;align-items:center;}
 .saloon-divider-moustache{
-  position:absolute;left:50%;top:50%;z-index:0;width:31px;height:16px;fill:#3D1A00;
-  opacity:0;transform:translate(-50%,-42%) scale(.82);
-  transition:opacity 240ms 100ms cubic-bezier(.23,1,.32,1),transform 360ms 70ms cubic-bezier(.22,1,.36,1);
+  position:absolute;left:50%;top:50%;z-index:0;width:34px;height:17px;fill:#3D1A00;
+  opacity:0;transform:translate(-50%,-40%) scale(.86);
+  transition:opacity 200ms 70ms cubic-bezier(.23,1,.32,1),transform 320ms 50ms cubic-bezier(.22,1,.36,1);
 }
 .saloon-mini-door{
-  position:relative;z-index:1;width:31px;height:24px;opacity:.96;
-  clip-path:polygon(0 0,100% 0,100% 72%,82% 100%,0 100%);
+  position:relative;z-index:1;width:58px;height:38px;opacity:.98;
   background:
-    linear-gradient(90deg,rgba(35,12,2,.22),transparent 42%,rgba(255,216,151,.09)),
-    repeating-linear-gradient(90deg,#603018 0,#603018 6px,#71391b 7px,#71391b 13px);
-  box-shadow:inset 0 0 0 1px rgba(255,220,163,.18),0 2px 4px rgba(61,26,0,.16);
+    linear-gradient(90deg,rgba(35,12,2,.3),transparent 18%,rgba(255,216,151,.1) 52%,rgba(35,12,2,.18)),
+    repeating-linear-gradient(90deg,#542611 0,#542611 10px,#653018 11px,#653018 20px);
+  box-shadow:inset 0 0 0 1px rgba(255,220,163,.2),inset 0 0 12px rgba(27,8,1,.2),0 3px 7px rgba(61,26,0,.18);
   backface-visibility:hidden;transform:translate3d(0,0,0) rotateY(0.01deg);
-  transition:transform 420ms cubic-bezier(.22,1,.36,1),opacity 300ms cubic-bezier(.22,1,.36,1);
+  transition:transform 360ms cubic-bezier(.22,1,.36,1),opacity 240ms cubic-bezier(.22,1,.36,1);
 }
 .saloon-mini-door::before{
-  content:"";position:absolute;inset:4px 5px;
-  border:1px solid rgba(244,205,143,.16);
+  content:"";position:absolute;left:7px;right:7px;top:8px;height:5px;
+  border-top:1px solid rgba(246,207,143,.3);border-bottom:1px solid rgba(35,12,2,.34);
+  box-shadow:0 16px 0 -1px rgba(246,207,143,.2),0 17px 0 -1px rgba(35,12,2,.28);
 }
-.saloon-mini-door-left{transform-origin:left center;border-right:1px solid rgba(36,10,1,.42);}
-.saloon-mini-door-right{transform-origin:right center;clip-path:polygon(0 0,100% 0,100% 100%,18% 100%,0 72%);}
-.saloon-divider-revealed .saloon-mini-door-left{transform:translate3d(-5px,0,0) rotateY(-22deg);opacity:.88;}
-.saloon-divider-revealed .saloon-mini-door-right{transform:translate3d(5px,0,0) rotateY(22deg);opacity:.88;}
+.saloon-mini-door::after{
+  content:"";position:absolute;top:50%;width:4px;height:4px;border-radius:50%;
+  background:#C68B42;box-shadow:0 0 0 1px rgba(38,12,2,.5);
+}
+.saloon-mini-door-left{
+  transform-origin:left center;border-right:1px solid rgba(36,10,1,.52);
+  border-radius:5px 1px 8px 4px;
+  clip-path:polygon(0 5%,78% 5%,100% 20%,100% 78%,78% 95%,0 95%);
+}
+.saloon-mini-door-left::after{right:8px;}
+.saloon-mini-door-right{
+  transform-origin:right center;border-left:1px solid rgba(244,205,143,.14);
+  border-radius:1px 5px 4px 8px;
+  clip-path:polygon(22% 5%,100% 5%,100% 95%,22% 95%,0 78%,0 20%);
+}
+.saloon-mini-door-right::after{left:8px;}
+.saloon-divider-revealed .saloon-mini-door-left{transform:translate3d(-8px,0,0) rotateY(-18deg);opacity:.94;}
+.saloon-divider-revealed .saloon-mini-door-right{transform:translate3d(8px,0,0) rotateY(18deg);opacity:.94;}
 .saloon-divider-revealed .saloon-divider-moustache{opacity:.82;transform:translate(-50%,-50%) scale(1);}
 .fg{display:grid;grid-template-columns:1fr;gap:18px;}
 .featured-image{height:clamp(210px,60vw,300px);}
@@ -956,14 +970,18 @@ a{text-decoration:none;}
 @media(max-width:640px){
   .western-section-bg{opacity:.36;background-position:center!important;}
   .western-section-overlay{background:rgba(244,224,184,.48);}
-  .saloon-divider{width:min(100%,300px);height:22px;gap:9px;margin-bottom:5px;}
-  .section-title-left .saloon-divider{width:min(100%,250px);}
-  .western-atmosphere .section-title{padding:8px 8px 6px;border-radius:12px;}
-  .saloon-mini-doors{width:50px;height:18px;}
-  .saloon-divider-moustache{width:23px;height:12px;}
-  .saloon-mini-door{width:24px;height:18px;transition-duration:340ms,240ms;}
-  .saloon-divider-revealed .saloon-mini-door-left{transform:translate3d(-4px,0,0) rotateY(-16deg);}
-  .saloon-divider-revealed .saloon-mini-door-right{transform:translate3d(4px,0,0) rotateY(16deg);}
+  .saloon-divider{width:min(100%,310px);height:32px;gap:8px;margin-bottom:0;}
+  .section-title-left .saloon-divider{width:min(100%,270px);}
+  .western-atmosphere .section-title{padding:3px 8px 5px;border-radius:12px;}
+  .saloon-mini-doors{width:88px;height:30px;}
+  .saloon-divider-moustache{width:25px;height:13px;}
+  .saloon-mini-door{width:44px;height:30px;transition-duration:300ms,210ms;}
+  .saloon-mini-door::before{left:6px;right:6px;top:6px;height:4px;box-shadow:0 12px 0 -1px rgba(246,207,143,.2),0 13px 0 -1px rgba(35,12,2,.28);}
+  .saloon-mini-door::after{width:3px;height:3px;}
+  .saloon-mini-door-left::after{right:6px;}
+  .saloon-mini-door-right::after{left:6px;}
+  .saloon-divider-revealed .saloon-mini-door-left{transform:translate3d(-6px,0,0) rotateY(-15deg);}
+  .saloon-divider-revealed .saloon-mini-door-right{transform:translate3d(6px,0,0) rotateY(15deg);}
   .student-layout{padding:20px 16px;}
   footer>div{justify-content:center!important;text-align:center;}
   .footer-address{flex-basis:100%;}
