@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars -- legacy inline image sources are retained for existing sections */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import howdyImage from "./assets/howdy-card.jpg";
 import dermanoImage from "./assets/dermano-card.jpg";
 import buffaloImage from "./assets/buffalo-card.jpg";
@@ -100,6 +100,42 @@ function WesternBackdrop({position="center"}){
       />
       <div className="western-section-overlay" aria-hidden="true"/>
     </>
+  );
+}
+
+/* ── SECTION REVEAL ─────────────────────────────────────────────── */
+function SaloonReveal({children,className="",...props}){
+  const sectionRef=useRef(null);
+  const [revealState,setRevealState]=useState(()=>{
+    if(typeof window==="undefined")return "revealed";
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches||!("IntersectionObserver" in window)
+      ?"revealed"
+      :"ready";
+  });
+
+  useEffect(()=>{
+    const section=sectionRef.current;
+    if(!section||revealState==="revealed")return undefined;
+
+    const observer=new IntersectionObserver(([entry])=>{
+      if(entry.isIntersecting){
+        setRevealState("revealed");
+        observer.disconnect();
+      }
+    },{threshold:.16,rootMargin:"0px 0px -8% 0px"});
+
+    observer.observe(section);
+    return()=>observer.disconnect();
+  },[revealState]);
+
+  return(
+    <section {...props} ref={sectionRef} className={`${className} saloon-reveal saloon-${revealState}`}>
+      {children}
+      <div className="saloon-doors" aria-hidden="true">
+        <div className="saloon-door saloon-door-left"/>
+        <div className="saloon-door saloon-door-right"/>
+      </div>
+    </section>
   );
 }
 
@@ -229,7 +265,7 @@ function FeaturedCard({item}){
 
 function FeaturedSection(){
   return(
-    <section className="sp featured-section western-atmosphere">
+    <SaloonReveal className="sp featured-section western-atmosphere">
       <WesternBackdrop position="center 52%"/>
       <div className="inner western-section-content">
         <SectionTitle sub="burgers &amp; kebab">Nos Incontournables</SectionTitle>
@@ -237,7 +273,7 @@ function FeaturedSection(){
           {FEATURED.map(f=><FeaturedCard key={f.key} item={f}/>)}
         </div>
       </div>
-    </section>
+    </SaloonReveal>
   );
 }
 
@@ -347,7 +383,7 @@ function MenuSection(){
 /* ── STUDENT SECTION ─────────────────────────────────────────────── */
 function StudentSection(){
   return(
-    <section id="etudiant" className="sp student-section western-atmosphere">
+    <SaloonReveal id="etudiant" className="sp student-section western-atmosphere">
       <WesternBackdrop position="left center"/>
       <div className="inner western-section-content">
         <SectionTitle sub="Disponible du lundi au vendredi · Jours scolaires">Menu Étudiant</SectionTitle>
@@ -375,13 +411,13 @@ function StudentSection(){
           </div>
         </div>
       </div>
-    </section>
+    </SaloonReveal>
   );
 }
 
 function GallerySection(){
   return(
-    <section id="galerie" className="sp gallery-section western-atmosphere">
+    <SaloonReveal id="galerie" className="sp gallery-section western-atmosphere">
       <WesternBackdrop position="right center"/>
       <div className="inner western-section-content">
         <SectionTitle sub="Burgers généreux, kebabs grillés et menus servis chez Chez Mus.">Galerie</SectionTitle>
@@ -393,14 +429,14 @@ function GallerySection(){
           ))}
         </div>
       </div>
-    </section>
+    </SaloonReveal>
   );
 }
 
 /* ── ABOUT ───────────────────────────────────────────────────────── */
 function About(){
   return(
-    <section id="histoire" className="sp about-section western-atmosphere">
+    <SaloonReveal id="histoire" className="sp about-section western-atmosphere">
       <WesternBackdrop position="center bottom"/>
       <div className="inner western-section-content">
         <div style={{display:"flex",flexWrap:"wrap",gap:"clamp(32px,5vw,56px)",alignItems:"center"}}>
@@ -427,7 +463,7 @@ function About(){
           </div>
         </div>
       </div>
-    </section>
+    </SaloonReveal>
   );
 }
 
@@ -745,6 +781,31 @@ a{text-decoration:none;}
 .gallery-section .western-section-bg{background-position:right center!important;}
 .about-section .western-section-bg{background-position:center bottom!important;}
 .featured-section,.student-section,.gallery-section,.about-section{background:#E7C891;}
+.saloon-reveal{perspective:1400px;}
+.saloon-doors{
+  position:absolute;inset:0;z-index:8;display:flex;pointer-events:none;
+  visibility:hidden;opacity:0;overflow:hidden;
+}
+.saloon-ready .saloon-doors{visibility:visible;opacity:1;}
+.saloon-door{
+  position:relative;flex:0 0 50%;height:100%;opacity:.92;
+  background:
+    linear-gradient(90deg,rgba(35,12,2,.18),transparent 22%,rgba(255,216,151,.1) 52%,rgba(35,12,2,.2)),
+    repeating-linear-gradient(90deg,#6b351b 0,#6b351b 16px,#76401f 17px,#76401f 34px);
+  box-shadow:inset 0 0 0 1px rgba(255,220,163,.16),inset 0 0 42px rgba(30,8,0,.26);
+  backface-visibility:hidden;transform:translate3d(0,0,0) rotateY(0.01deg);
+  transition:transform 500ms cubic-bezier(.22,1,.36,1),opacity 360ms cubic-bezier(.22,1,.36,1);
+}
+.saloon-door::before{
+  content:"";position:absolute;inset:14px;
+  border:1px solid rgba(244,205,143,.18);
+  background:linear-gradient(155deg,transparent 35%,rgba(255,222,168,.05) 36%,transparent 37%);
+}
+.saloon-door-left{transform-origin:left center;border-right:1px solid rgba(40,12,2,.42);}
+.saloon-door-right{transform-origin:right center;border-left:1px solid rgba(244,205,143,.12);}
+.saloon-revealed .saloon-door-left{transform:translate3d(-14%,0,0) rotateY(18deg);opacity:0;}
+.saloon-revealed .saloon-door-right{transform:translate3d(14%,0,0) rotateY(-18deg);opacity:0;}
+.saloon-revealed .saloon-doors{visibility:hidden;opacity:1;transition:visibility 0s linear 520ms;}
 .fg{display:grid;grid-template-columns:1fr;gap:18px;}
 .featured-image{height:clamp(210px,60vw,300px);}
 .mc{display:grid;grid-template-columns:1fr;gap:0;}
@@ -778,6 +839,10 @@ a{text-decoration:none;}
 @media(max-width:640px){
   .western-section-bg{opacity:.36;background-position:center!important;}
   .western-section-overlay{background:rgba(244,224,184,.48);}
+  .saloon-door{opacity:.76;transition-duration:380ms,280ms;}
+  .saloon-revealed .saloon-door-left{transform:translate3d(-8%,0,0) rotateY(10deg);}
+  .saloon-revealed .saloon-door-right{transform:translate3d(8%,0,0) rotateY(-10deg);}
+  .saloon-revealed .saloon-doors{transition-delay:400ms;}
   .student-layout{padding:20px 16px;}
   footer>div{justify-content:center!important;text-align:center;}
   .footer-address{flex-basis:100%;}
@@ -788,6 +853,10 @@ a{text-decoration:none;}
 }
 @media(max-width:480px){
   .tab{padding:11px 10px;font-size:.73rem;}
+  .saloon-doors{display:none!important;}
+}
+@media(prefers-reduced-motion:reduce){
+  .saloon-doors{display:none!important;}
 }
 @media(max-width:979px){
   .hero-shell{min-height:auto;display:flex;flex-direction:column;}
