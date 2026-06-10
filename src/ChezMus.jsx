@@ -77,11 +77,64 @@ function Divider({light=false}){
   );
 }
 
-function MoustacheMark({className=""}){
+function MoustacheMark({className="",...props}){
   return(
-    <svg className={className} viewBox="0 0 64 32" aria-hidden="true" focusable="false">
+    <svg className={className} viewBox="0 0 64 32" aria-hidden="true" focusable="false" {...props}>
       <path d="M32 17c-5-7-13-7.5-17-1.5C11.5 21 5.5 22 1 20.5 6 31 21 31 32 22c11 9 26 9 31-1.5-4.5 1.5-10.5.5-14-5-4-6-12-5.5-17 1.5Z"/>
     </svg>
+  );
+}
+
+function MobileMoustacheTap(){
+  const [accent,setAccent]=useState(null);
+  const touchStart=useRef(null);
+  const hideTimer=useRef(null);
+
+  useEffect(()=>{
+    if(!window.matchMedia("(pointer: coarse)").matches)return undefined;
+
+    const onPointerDown=(event)=>{
+      if(!event.isPrimary)return;
+      touchStart.current={x:event.clientX,y:event.clientY,moved:false};
+    };
+    const onPointerMove=(event)=>{
+      const start=touchStart.current;
+      if(!start)return;
+      if(Math.hypot(event.clientX-start.x,event.clientY-start.y)>10)start.moved=true;
+    };
+    const onPointerUp=(event)=>{
+      const start=touchStart.current;
+      touchStart.current=null;
+      if(!start||start.moved||!event.isPrimary)return;
+
+      window.clearTimeout(hideTimer.current);
+      setAccent({x:event.clientX,y:event.clientY,id:Date.now()});
+      const duration=window.matchMedia("(prefers-reduced-motion: reduce)").matches?180:460;
+      hideTimer.current=window.setTimeout(()=>setAccent(null),duration);
+    };
+    const cancel=()=>{touchStart.current=null;};
+
+    window.addEventListener("pointerdown",onPointerDown,{passive:true});
+    window.addEventListener("pointermove",onPointerMove,{passive:true});
+    window.addEventListener("pointerup",onPointerUp,{passive:true});
+    window.addEventListener("pointercancel",cancel,{passive:true});
+
+    return()=>{
+      window.clearTimeout(hideTimer.current);
+      window.removeEventListener("pointerdown",onPointerDown);
+      window.removeEventListener("pointermove",onPointerMove);
+      window.removeEventListener("pointerup",onPointerUp);
+      window.removeEventListener("pointercancel",cancel);
+    };
+  },[]);
+
+  if(!accent)return null;
+  return(
+    <MoustacheMark
+      key={accent.id}
+      className="mobile-touch-moustache"
+      style={{left:accent.x,top:accent.y}}
+    />
   );
 }
 
@@ -210,7 +263,6 @@ function Hero(){
       <div className="hero-shell">
         <div
           className="hero-food-scene"
-          style={{backgroundImage:'url("/images/home-food-hero.png")'}}
           role="img"
           aria-label="Burger, dürüm kebab et frites Chez Mus"
         />
@@ -220,7 +272,7 @@ function Hero(){
             <p className="hero-location">
               <span aria-hidden="true">★</span>
               <MoustacheMark className="hero-moustache"/>
-              <span>Herstal · 100% Halal · Depuis 2022</span>
+              <span>Herstal · 100% Halal · Since 2026</span>
               <span aria-hidden="true">★</span>
             </p>
             <h1 className="f-west">Des burgers généreux et des kebabs <span>grillés à Herstal</span></h1>
@@ -609,6 +661,7 @@ a{text-decoration:none;}
 }
 .hero-food-scene{
   position:absolute;inset:0;z-index:1;
+  background-image:url("/images/home-food-hero.png");
   background-size:auto 100%;background-position:right center;background-repeat:no-repeat;
 }
 .hero-scene-wash{
@@ -953,8 +1006,8 @@ a{text-decoration:none;}
   .hamburger{display:none!important;}
 }
 @media(hover:hover) and (pointer:fine){
-  a,button,.gallery-card{
-    cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cpath d='M16 13c-2.3-3.2-6.4-3.4-8.3-.5C5.9 15.2 3 15.6 1 14.8c2.4 5.4 9.6 6.3 15 1.2 5.4 5.1 12.6 4.2 15 1.4-2 .8-4.9.4-6.7-2.3-1.9-2.9-6-2.7-8.3.5Z' fill='%233D1A00' stroke='%23F5EFE0' stroke-width='1'/%3E%3C/svg%3E") 16 13,pointer;
+  html,body,body *{
+    cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='24' viewBox='0 0 32 24'%3E%3Cpath d='M16 13c-2.3-3.2-6.4-3.4-8.3-.5C5.9 15.2 3 15.6 1 14.8c2.4 5.4 9.6 6.3 15 1.2 5.4 5.1 12.6 4.2 15 1.4-2 .8-4.9.4-6.7-2.3-1.9-2.9-6-2.7-8.3.5Z' fill='%233D1A00' stroke='%23F5EFE0' stroke-width='1'/%3E%3C/svg%3E") 16 13,auto!important;
   }
   .btn-orange::after,.btn-dark::after,.btn-outline-dark::after{
     content:"";position:absolute;left:50%;bottom:-12px;width:24px;height:12px;
@@ -967,6 +1020,7 @@ a{text-decoration:none;}
     opacity:.72;transform:translate(-50%,0) scale(1);
   }
 }
+.mobile-touch-moustache{display:none;}
 @media(min-width:1020px){
   .fg{grid-template-columns:repeat(4,1fr);}
   .featured-image{height:190px;}
@@ -1002,8 +1056,20 @@ a{text-decoration:none;}
   .saloon-mini-door,.saloon-divider-moustache,.nav-link,.nav-link::after,
   .btn-orange,.btn-orange::after,.btn-dark,.btn-dark::after,.btn-outline-dark,.btn-outline-dark::after,
   .gallery-card img{transition:none!important;}
+  .mobile-touch-moustache{animation:none!important;opacity:.7;transform:translate(-50%,-50%) scale(1)!important;}
 }
 @media(hover:none),(pointer:coarse){
+  .mobile-touch-moustache{
+    position:fixed;z-index:9999;display:block;width:34px;height:17px;fill:#3D1A00;
+    filter:drop-shadow(0 1px 0 rgba(245,239,224,.85)) drop-shadow(0 2px 3px rgba(61,26,0,.2));
+    pointer-events:none;transform:translate(-50%,-50%) scale(.9);
+    animation:moustache-tap 440ms cubic-bezier(.2,.75,.25,1) both;
+  }
+  @keyframes moustache-tap{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.9);}
+    30%{opacity:.86;transform:translate(-50%,-62%) scale(1);}
+    100%{opacity:0;transform:translate(-50%,-74%) scale(.96);}
+  }
   .btn-orange,.btn-dark,.btn-outline-dark{position:relative;}
   .btn-orange::after,.btn-dark::after,.btn-outline-dark::after{
     content:"";position:absolute;right:5px;bottom:3px;width:17px;height:13px;
@@ -1015,16 +1081,18 @@ a{text-decoration:none;}
   .btn-orange:active::after,.btn-dark:active::after,.btn-outline-dark:active::after{opacity:.5;transform:scale(1);}
 }
 @media(max-width:979px){
-  .hero-shell{min-height:auto;display:flex;flex-direction:column;}
+  .hero-shell{min-height:clamp(650px,92svh,790px);display:flex;align-items:stretch;}
   .hero-food-scene{
-    position:relative;inset:auto;z-index:1;width:100%;height:min(58vw,520px);
-    order:2;background-size:cover;background-position:57% center;
+    position:absolute;inset:0;z-index:1;width:100%;height:100%;
+    background-image:url("/images/home-food-hero-mobile.png");
+    background-size:cover;background-position:center bottom;
   }
   .hero-scene-wash{
     background:
-      linear-gradient(180deg,rgba(218,177,123,.98) 0%,rgba(218,177,123,.83) 13%,transparent 34%,transparent 76%,rgba(42,14,2,.3) 100%);
+      linear-gradient(180deg,rgba(218,177,123,.99) 0%,rgba(218,177,123,.97) 46%,rgba(218,177,123,.86) 62%,rgba(197,139,80,.28) 79%,rgba(42,14,2,.22) 100%),
+      linear-gradient(90deg,rgba(218,177,123,.95) 0%,rgba(218,177,123,.72) 55%,rgba(61,26,0,.04) 100%);
   }
-  .hero-grid{order:1;min-height:auto;padding-top:62px;padding-bottom:38px;align-items:flex-start;}
+  .hero-grid{min-height:100%;padding-top:58px;padding-bottom:54px;align-items:flex-start;}
   .hero-copy{width:min(100%,680px);}
   .student-layout{grid-template-columns:1fr;}
   .student-copy{max-width:620px;}
@@ -1033,25 +1101,30 @@ a{text-decoration:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:360px;}
 }
 @media(max-width:560px){
+  .hero-shell{min-height:760px;}
   .hero-shell{border-bottom-width:6px;}
   .hero-shell::after{inset:8px;border-radius:12px;}
-  .hero-grid{padding:44px 20px 30px;}
-  .hero-copy h1{font-size:clamp(2.15rem,10.8vw,3.05rem);line-height:1.08;}
-  .hero-location{font-size:.66rem;letter-spacing:.13em;gap:8px;margin-bottom:18px;}
-  .hero-description{margin-bottom:24px;line-height:1.65;}
+  .hero-grid{padding:40px 20px 46px;}
+  .hero-copy h1{font-size:clamp(2.05rem,10.2vw,2.8rem);line-height:1.07;margin-bottom:20px;}
+  .hero-location{font-size:.62rem;letter-spacing:.11em;gap:7px;margin-bottom:16px;white-space:nowrap;}
+  .hero-moustache{width:22px;height:11px;}
+  .hero-description{max-width:350px;margin-bottom:21px;line-height:1.58;font-size:.94rem;}
   .hero-actions{align-items:stretch;}
   .hero-actions .btn-orange,.hero-actions .btn-outline-dark{
     justify-content:center;flex:1 1 145px;padding-left:16px;padding-right:16px;white-space:nowrap;
   }
-  .hero-food-scene{height:270px;background-position:58% center;}
+  .hero-food-scene{background-size:cover;background-position:center bottom;}
   .hero-scene-wash{
-    background:linear-gradient(180deg,rgba(218,177,123,.98) 0%,rgba(218,177,123,.62) 12%,transparent 32%,transparent 78%,rgba(42,14,2,.32) 100%);
+    background:
+      linear-gradient(180deg,rgba(218,177,123,.99) 0%,rgba(218,177,123,.98) 48%,rgba(218,177,123,.9) 61%,rgba(207,157,102,.52) 72%,rgba(68,25,4,.13) 100%),
+      linear-gradient(90deg,rgba(218,177,123,.88) 0%,rgba(218,177,123,.58) 60%,rgba(61,26,0,.02) 100%);
   }
   .student-photo{height:290px;}
   .student-photo-wrap::after{display:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:320px;}
 }
 ` }</style>
+      <MobileMoustacheTap/>
       <Header scrolled={scrolled}/>
       <main>
         <Hero/>
