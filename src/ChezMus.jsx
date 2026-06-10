@@ -138,7 +138,7 @@ function MobileMoustacheTap(){
   );
 }
 
-function SaloonDivider({light=false}){
+function SaloonDivider({light=false,variant=""}){
   const dividerRef=useRef(null);
   const [revealState,setRevealState]=useState(()=>{
     if(typeof window==="undefined")return "revealed";
@@ -163,7 +163,7 @@ function SaloonDivider({light=false}){
   },[revealState]);
 
   return(
-    <div ref={dividerRef} className={`saloon-divider saloon-divider-${revealState}${light?" is-light":""}`} aria-hidden="true">
+    <div ref={dividerRef} className={`saloon-divider saloon-divider-${revealState}${light?" is-light":""}${variant?` saloon-divider-${variant}`:""}`} aria-hidden="true">
       <span className="saloon-divider-line"/>
       <span className="saloon-mini-doors">
         <MoustacheMark className="saloon-divider-moustache"/>
@@ -175,10 +175,10 @@ function SaloonDivider({light=false}){
   );
 }
 
-function SectionTitle({children,sub,light=false,style,align="center",headingStyle}){
+function SectionTitle({children,sub,light=false,style,align="center",headingStyle,dividerVariant=""}){
   return(
     <div className={`section-title section-title-${align}`} style={{textAlign:align,marginBottom:"clamp(28px,4vw,42px)",...style}}>
-      <SaloonDivider light={light}/>
+      <SaloonDivider light={light} variant={dividerVariant}/>
       <h2 className="f-west" style={{fontSize:"clamp(1.55rem,3.5vw,2.4rem)",color:light?C.cream:C.brown,letterSpacing:".015em",margin:"7px 0 5px",lineHeight:1.1,...headingStyle}}>
         {children}
       </h2>
@@ -275,7 +275,7 @@ function Hero(){
               <span>Herstal · 100% Halal · Since 2026</span>
               <span aria-hidden="true">★</span>
             </p>
-            <h1 className="f-west">Des burgers généreux et des kebabs <span>grillés à Herstal</span></h1>
+            <h1 className="f-west">Des burgers généreux et des kebabs grillés à <span>Herstal</span></h1>
             <p className="hero-description">
               Chez Mus réunit burgers bien garnis, kebabs grillés et menus étudiants dans un spot local à l’identité western.
             </p>
@@ -452,7 +452,7 @@ function StudentSection(){
     <section id="etudiant" className="sp student-section western-atmosphere">
       <WesternBackdrop position="left center"/>
       <div className="inner western-section-content">
-        <SectionTitle sub="Disponible du lundi au vendredi · Jours scolaires">Menu Étudiant</SectionTitle>
+        <SectionTitle dividerVariant="student" sub="Disponible du lundi au vendredi · Jours scolaires">Menu Étudiant</SectionTitle>
         <div className="student-layout">
           <div className="student-copy">
             <p className="student-lead">
@@ -971,6 +971,39 @@ a{text-decoration:none;}
 .saloon-divider-revealed .saloon-mini-door-left{transform:translate3d(-1px,0,0) rotateY(-42deg);opacity:.92;}
 .saloon-divider-revealed .saloon-mini-door-right{transform:translate3d(1px,0,0) rotateY(42deg);opacity:.92;}
 .saloon-divider-revealed .saloon-divider-moustache{opacity:.82;transform:translate(-50%,-50%) scale(1);}
+.saloon-divider-student .saloon-mini-doors{width:108px;}
+.saloon-divider-student .saloon-mini-door{
+  width:54px;height:36px;
+  background:
+    linear-gradient(90deg,rgba(30,10,2,.2),transparent 16%,rgba(255,222,163,.12) 46%,rgba(31,10,2,.16)),
+    linear-gradient(180deg,rgba(255,213,144,.12),transparent 38%,rgba(37,12,2,.18)),
+    repeating-linear-gradient(90deg,#59301B 0,#59301B 8px,#6A3A21 9px,#6A3A21 17px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,226,177,.18),
+    inset 0 -7px 12px rgba(32,10,2,.17),
+    0 2px 3px rgba(61,26,0,.15),
+    0 5px 10px rgba(61,26,0,.09);
+  transition:transform 520ms cubic-bezier(.18,.82,.22,1.12),opacity 260ms cubic-bezier(.23,1,.32,1);
+}
+.saloon-divider-student .saloon-mini-door::before{
+  left:7px;right:7px;top:8px;height:4px;
+  border-color:rgba(255,224,170,.22) transparent rgba(35,11,2,.25);
+  box-shadow:0 14px 0 -1px rgba(255,218,156,.16),0 15px 0 -1px rgba(35,11,2,.22);
+}
+.saloon-divider-student .saloon-mini-door::after{
+  width:3px;height:3px;background:#B77B38;box-shadow:0 0 0 1px rgba(38,12,2,.42);
+}
+.saloon-divider-student .saloon-mini-door-left{
+  border-radius:6px 1px 7px 5px;
+  clip-path:polygon(0 4%,80% 4%,100% 18%,100% 79%,80% 96%,0 96%);
+}
+.saloon-divider-student .saloon-mini-door-right{
+  border-radius:1px 6px 5px 7px;
+  clip-path:polygon(20% 4%,100% 4%,100% 96%,20% 96%,0 79%,0 18%);
+}
+.saloon-divider-student.saloon-divider-revealed .saloon-mini-door-left{transform:rotateY(-32deg);opacity:.95;}
+.saloon-divider-student.saloon-divider-revealed .saloon-mini-door-right{transform:rotateY(32deg);opacity:.95;}
+.saloon-divider-student.saloon-divider-revealed .saloon-divider-moustache{opacity:.68;}
 .fg{display:grid;grid-template-columns:1fr;gap:18px;}
 .featured-image{height:clamp(210px,60vw,300px);}
 .mc{display:grid;grid-template-columns:1fr;gap:0;}
@@ -1101,24 +1134,29 @@ a{text-decoration:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:360px;}
 }
 @media(max-width:560px){
-  .hero-shell{min-height:760px;}
+  .hero-shell{min-height:710px;}
   .hero-shell{border-bottom-width:6px;}
   .hero-shell::after{inset:8px;border-radius:12px;}
-  .hero-grid{padding:40px 20px 46px;}
-  .hero-copy h1{font-size:clamp(2.05rem,10.2vw,2.8rem);line-height:1.07;margin-bottom:20px;}
-  .hero-location{font-size:.62rem;letter-spacing:.11em;gap:7px;margin-bottom:16px;white-space:nowrap;}
+  .hero-grid{padding:34px 20px 38px;}
+  .hero-copy h1{font-size:clamp(1.72rem,8.7vw,2.35rem);line-height:1.1;margin-bottom:16px;max-width:350px;}
+  .hero-location{font-size:.6rem;letter-spacing:.1em;gap:7px;margin-bottom:13px;white-space:nowrap;}
   .hero-moustache{width:22px;height:11px;}
-  .hero-description{max-width:350px;margin-bottom:21px;line-height:1.58;font-size:.94rem;}
-  .hero-actions{align-items:stretch;}
+  .hero-description{max-width:345px;margin-bottom:18px;line-height:1.55;font-size:.91rem;}
+  .hero-actions{align-items:stretch;gap:11px;margin-bottom:14px;}
   .hero-actions .btn-orange,.hero-actions .btn-outline-dark{
-    justify-content:center;flex:1 1 145px;padding-left:16px;padding-right:16px;white-space:nowrap;
+    justify-content:center;flex:1 1 145px;min-height:48px;padding:12px 14px;white-space:nowrap;
   }
+  .hero-student-link{padding:6px 0 5px;font-size:.8rem;}
   .hero-food-scene{background-size:cover;background-position:center bottom;}
   .hero-scene-wash{
     background:
-      linear-gradient(180deg,rgba(218,177,123,.99) 0%,rgba(218,177,123,.98) 48%,rgba(218,177,123,.9) 61%,rgba(207,157,102,.52) 72%,rgba(68,25,4,.13) 100%),
-      linear-gradient(90deg,rgba(218,177,123,.88) 0%,rgba(218,177,123,.58) 60%,rgba(61,26,0,.02) 100%);
+      linear-gradient(180deg,rgba(218,177,123,.99) 0%,rgba(218,177,123,.97) 42%,rgba(218,177,123,.84) 55%,rgba(207,157,102,.46) 66%,rgba(68,25,4,.06) 100%),
+      linear-gradient(90deg,rgba(218,177,123,.84) 0%,rgba(218,177,123,.48) 58%,rgba(61,26,0,.01) 100%);
   }
+  .saloon-divider-student .saloon-mini-doors{width:84px;height:29px;}
+  .saloon-divider-student .saloon-mini-door{width:42px;height:29px;}
+  .saloon-divider-student.saloon-divider-revealed .saloon-mini-door-left{transform:rotateY(-28deg);}
+  .saloon-divider-student.saloon-divider-revealed .saloon-mini-door-right{transform:rotateY(28deg);}
   .student-photo{height:290px;}
   .student-photo-wrap::after{display:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:320px;}
