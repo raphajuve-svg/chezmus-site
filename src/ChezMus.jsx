@@ -42,10 +42,10 @@ const EXTRAS=[
   {n:"Ayran fait maison",p:"3€"},{n:"Dessert",p:"3,50€"},
 ];
 const FEATURED=[
-  {key:"howdy",  name:"Le Howdy",  desc:"Steak de bœuf, sauce burger, cheddar, cornichons, oignons caramélisés",          p:"7,50€",m:"11€",    badge:"N°1",position:"50% 68%"},
-  {key:"dermano",name:"Le Dermano",desc:"Steak de bœuf, sauce BBQ, cheddar, bacon, aubergine grillée, oignons caramélisés",p:"8,50€",m:"12€",   badge:null,position:"50% 72%"},
-  {key:"buffalo",name:"Le Buffalo",desc:"2 steaks de bœuf, sauce BBQ, cheddar, bacon, cornichons, oignons caramélisés",    p:"9,50€",m:"13€",    badge:"Double",position:"50% 68%"},
-  {key:"adana",  name:"Adana",     desc:"Brochette de bœuf épicée et crudités, servie en dürüm",                            p:"9€",   m:"13,50€", badge:"Grillé",position:"50% 64%"},
+  {key:"howdy",  name:"Le Howdy",  desc:"Steak de bœuf, sauce burger, cheddar, cornichons, oignons caramélisés",          p:"7,50€",m:"11€",    badge:"Le favori",position:"50% 68%"},
+  {key:"dermano",name:"Le Dermano",desc:"Steak de bœuf, sauce BBQ, cheddar, bacon, aubergine grillée, oignons caramélisés",p:"8,50€",m:"12€",   badge:"Bien chargé",position:"50% 72%"},
+  {key:"buffalo",name:"Le Buffalo",desc:"2 steaks de bœuf, sauce BBQ, cheddar, bacon, cornichons, oignons caramélisés",    p:"9,50€",m:"13€",    badge:"Double steak",position:"50% 68%"},
+  {key:"adana",  name:"Adana",     desc:"Brochette de bœuf épicée et crudités, servie en dürüm",                            p:"9€",   m:"13,50€", badge:"À tester",position:"50% 64%"},
 ];
 
 const GALLERY=[
@@ -53,7 +53,20 @@ const GALLERY=[
   {src:dermanoImage,alt:"Burger Dermano devant Chez Mus",position:"50% 68%"},
   {src:buffaloImage,alt:"Burger Buffalo Chez Mus",position:"50% 67%"},
   {src:adanaImage,alt:"Kebab Adana grillé Chez Mus",position:"50% 62%"},
-  {src:heroFoodImage,alt:"Burger bacon cheddar Chez Mus",position:"50% 50%"},
+  {src:studentMenuImage,alt:"Menu étudiant Chez Mus avec burger et frites",position:"50% 58%"},
+];
+
+const INFO_ITEMS=[
+  {label:"Horaires",value:"Bientôt disponibles"},
+  {label:"Adresse",value:"Rue Elisa Dumonceau 69"},
+  {label:"Téléphone",value:"Bientôt disponible"},
+  {label:"Service",value:"Sur place & à emporter"},
+];
+
+const REVIEWS=[
+  {name:"Client Google",quote:"Burgers généreux, accueil chaleureux et une vraie identité qui change.",rating:"★★★★★"},
+  {name:"Habitué du quartier",quote:"Une adresse locale à Herstal pour manger bien chargé sans prise de tête.",rating:"★★★★★"},
+  {name:"Étudiant",quote:"Le menu étudiant est clair, pratique et parfait entre deux cours.",rating:"★★★★★"},
 ];
 
 const C={
@@ -275,11 +288,11 @@ function Hero(){
             </p>
             <h1 className="f-west">Des burgers généreux et des kebabs grillés à <span>Herstal</span></h1>
             <p className="hero-description">
-              Chez Mus réunit burgers bien garnis, kebabs grillés et menus étudiants dans un spot local à l’identité western.
+              Le saloon burger-kebab de Herstal : burgers bien garnis, kebabs grillés, menus étudiants et caractère cowboy.
             </p>
             <div className="hero-actions">
               <a href="#menu" className="btn-orange">Voir le menu <span aria-hidden="true">→</span></a>
-              <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer" className="btn-outline-dark">Itinéraire</a>
+              <a href="#contact" className="btn-outline-dark">Commander</a>
             </div>
             <a href="#etudiant" className="hero-student-link">Menu étudiant <span aria-hidden="true">→</span></a>
           </div>
@@ -289,11 +302,32 @@ function Hero(){
   );
 }
 
+function InfoBar(){
+  return(
+    <section className="quick-info-section" aria-label="Informations pratiques Chez Mus">
+      <div className="quick-info-strip">
+        {INFO_ITEMS.map((item,index)=>(
+          <div key={item.label} className="quick-info-item">
+            <span className="quick-info-index">{String(index+1).padStart(2,"0")}</span>
+            <div>
+              <strong>{item.label}</strong>
+              <span>{item.value}</span>
+            </div>
+          </div>
+        ))}
+        <a className="quick-info-cta" href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer">
+          Itinéraire <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 /* ── FEATURED CARD ───────────────────────────────────────────────── */
 function FeaturedCard({item}){
   const [hov,setHov]=useState(false);
   return(
-    <div className="featured-card" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+    <div className="featured-card best-seller-card reveal-card" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{background:C.paper,borderRadius:10,overflow:"hidden",border:`1px solid ${C.border}`,
         display:"flex",flexDirection:"column",
         transition:"all .28s ease",
@@ -305,9 +339,7 @@ function FeaturedCard({item}){
             transform:hov?"scale(1.035)":"scale(1)",transition:"transform .5s ease"}}
         />
         {item.badge&&(
-          <div style={{position:"absolute",top:10,left:10,background:C.brown,color:"#F5EFE0",
-            fontFamily:"'Outfit',sans-serif",fontWeight:700,fontSize:".6rem",
-            padding:"3px 9px",borderRadius:4,letterSpacing:".1em",textTransform:"uppercase"}}>
+          <div className="dish-label">
             {item.badge}
           </div>
         )}
@@ -322,6 +354,7 @@ function FeaturedCard({item}){
           <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:800,fontSize:".92rem",color:C.orange}}>{item.p} seul</span>
           <span style={{fontFamily:"'Outfit',sans-serif",fontSize:".73rem",color:C.light,background:C.sand,padding:"3px 8px",borderRadius:4,border:`1px solid ${C.border}`}}>Menu {item.m}</span>
         </div>
+        <a href="#menu" className="dish-card-link">Voir dans le menu <span aria-hidden="true">→</span></a>
       </div>
     </div>
   );
@@ -332,7 +365,7 @@ function FeaturedSection(){
     <section className="sp featured-section western-atmosphere">
       <WesternBackdrop position="center 52%"/>
       <div className="inner western-section-content">
-        <SectionTitle sub="burgers &amp; kebab">Nos Incontournables</SectionTitle>
+        <SectionTitle sub="Les classiques qui font revenir">Nos Incontournables</SectionTitle>
         <div className="fg">
           {FEATURED.map(f=><FeaturedCard key={f.key} item={f}/>)}
         </div>
@@ -444,6 +477,36 @@ function MenuSection(){
   );
 }
 
+function LimitedOffer(){
+  return(
+    <section className="sp offer-section">
+      <div className="inner">
+        <div className="offer-panel">
+          <div className="offer-copy">
+            <span className="offer-tag">À commander quand tu veux du costaud</span>
+            <h2 className="f-west">Le Buffalo fait son show</h2>
+            <p>
+              Double steak, cheddar, bacon, sauce BBQ, cornichons et oignons caramélisés.
+              Un burger généreux, net, bien western.
+            </p>
+            <div className="offer-actions">
+              <a href="#menu" className="btn-orange">Voir le menu <span aria-hidden="true">→</span></a>
+              <a href="#contact" className="btn-ghost">Commander</a>
+            </div>
+          </div>
+          <div className="offer-visual">
+            <img src={buffaloImage} alt="Burger Buffalo Chez Mus" loading="lazy"/>
+            <div className="offer-price">
+              <span>Menu</span>
+              <strong>13€</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ── STUDENT SECTION ─────────────────────────────────────────────── */
 function StudentSection(){
   return(
@@ -487,9 +550,34 @@ function GallerySection(){
         <SectionTitle sub="Burgers généreux, kebabs grillés et menus servis chez Chez Mus.">Galerie</SectionTitle>
         <div className="gallery-grid">
           {GALLERY.map((item,index)=>(
-            <figure key={item.alt} className={`gallery-card gallery-card-${index+1}`}>
+            <figure key={item.alt} className={`gallery-card gallery-card-${index+1} reveal-card`} style={{animationDelay:`${index*70}ms`}}>
               <img src={item.src} alt={item.alt} loading="lazy" style={{objectPosition:item.position}}/>
             </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ReviewsSection(){
+  return(
+    <section className="sp reviews-section">
+      <div className="inner">
+        <div className="reviews-head">
+          <SectionTitle sub="Avis clients & ambiance locale">Ils parlent de Chez Mus</SectionTitle>
+          <p>
+            Une adresse de quartier doit donner envie avant même d’ouvrir la porte :
+            du goût, du caractère et un accueil simple.
+          </p>
+        </div>
+        <div className="review-grid">
+          {REVIEWS.map((review,index)=>(
+            <article key={review.name} className="review-card reveal-card" style={{animationDelay:`${index*90}ms`}}>
+              <div className="review-stars" aria-label="5 étoiles">{review.rating}</div>
+              <p>“{review.quote}”</p>
+              <strong>{review.name}</strong>
+            </article>
           ))}
         </div>
       </div>
@@ -548,17 +636,25 @@ function Contact(){
         <SectionTitle>Nous Trouver</SectionTitle>
         <div className="contact-panel">
           <div className="contact-card">
+            <div className="contact-mini-label">Le saloon est à Herstal</div>
             <div style={{marginBottom:22}}>
               <div style={{fontFamily:"'Outfit',sans-serif",fontWeight:800,fontSize:"1.12rem",color:C.brown,marginBottom:4}}>
                 Rue Elisa Dumonceau 69
               </div>
               <div style={{fontFamily:"'Outfit',sans-serif",color:C.light,fontSize:".93rem"}}>4040 Herstal, Belgique</div>
             </div>
-            <p className="hours-note">Horaires bientôt disponibles</p>
+            <div className="contact-facts">
+              <span><strong>Horaires</strong> bientôt disponibles</span>
+              <span><strong>Téléphone</strong> bientôt disponible</span>
+              <span><strong>Service</strong> sur place & à emporter</span>
+            </div>
             <div style={{display:"flex",flexWrap:"wrap",gap:10,marginBottom:20}}>
               <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer"
                 className="btn-dark" style={{flex:"1 1 150px",justifyContent:"center"}}>
                 Itinéraire
+              </a>
+              <a href="#menu" className="btn-outline-dark" style={{flex:"1 1 150px",justifyContent:"center"}}>
+                Voir le menu
               </a>
             </div>
             <a href="https://instagram.com/chezmusburger" target="_blank" rel="noreferrer"
@@ -734,6 +830,42 @@ a{text-decoration:none;}
 .hero-student-link span{color:#E65F05;transition:transform 180ms cubic-bezier(.23,1,.32,1);}
 .hero-student-link:hover span{transform:translateX(3px);}
 
+/* ── Quick info strip ── */
+.quick-info-section{
+  position:relative;z-index:8;margin-top:-1px;background:#2A0E02;
+  border-top:1px solid rgba(255,230,180,.18);
+  border-bottom:4px solid #7B3715;
+}
+.quick-info-strip{
+  width:min(1180px,calc(100% - clamp(28px,6vw,88px)));margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;align-items:stretch;
+  background:#3D1A00;border-left:1px solid rgba(255,224,164,.16);border-right:1px solid rgba(255,224,164,.16);
+}
+.quick-info-item{
+  display:flex;gap:12px;align-items:center;padding:17px 18px;
+  border-right:1px solid rgba(255,224,164,.13);
+}
+.quick-info-index{
+  font-family:'Rye',serif;font-size:.82rem;color:#E8700A;
+}
+.quick-info-item strong,.quick-info-item span{
+  display:block;font-family:'Outfit',sans-serif;
+}
+.quick-info-item strong{
+  font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;color:#C4924A;margin-bottom:3px;
+}
+.quick-info-item div span{
+  font-size:.86rem;font-weight:750;color:#F5EFE0;line-height:1.25;
+}
+.quick-info-cta{
+  display:flex;align-items:center;justify-content:center;gap:8px;padding:17px 22px;
+  font-family:'Outfit',sans-serif;font-weight:850;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;
+  color:#2A0E02;background:#E8700A;white-space:nowrap;
+}
+.quick-info-cta:hover{background:#F17A10;}
+.quick-info-cta span{transition:transform 180ms cubic-bezier(.23,1,.32,1);}
+.quick-info-cta:hover span{transform:translateX(3px);}
+
 /* ── Student offer ── */
 .student-layout{
   display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);
@@ -809,6 +941,20 @@ a{text-decoration:none;}
   content:"";position:absolute;inset:6px;border:1px solid rgba(105,58,31,.12);
   border-radius:6px;pointer-events:none;
 }
+.best-seller-card{isolation:isolate;}
+.best-seller-card:hover .dish-card-link span{transform:translateX(3px);}
+.dish-label{
+  position:absolute;top:12px;left:12px;background:#E8700A;color:#fff;
+  font-family:'Outfit',sans-serif;font-weight:850;font-size:.62rem;
+  padding:6px 10px;border-radius:999px;letter-spacing:.09em;text-transform:uppercase;
+  border:1px solid rgba(83,37,15,.22);box-shadow:0 5px 14px rgba(61,26,0,.18);
+}
+.dish-card-link{
+  display:inline-flex;align-items:center;gap:7px;width:max-content;margin-top:13px;
+  font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:800;color:#3D1A00;
+  border-bottom:1px solid rgba(232,112,10,.35);padding-bottom:4px;
+}
+.dish-card-link span{color:#E8700A;transition:transform 180ms cubic-bezier(.23,1,.32,1);}
 .about-photo{position:relative;border:2px solid rgba(78,32,12,.5);}
 .about-photo::after{content:"";position:absolute;inset:8px;border:1px solid rgba(255,226,173,.34);border-radius:5px;pointer-events:none;}
 .about-kicker{
@@ -851,6 +997,87 @@ a{text-decoration:none;}
 .map-fallback div:last-child{display:flex;flex-direction:column;gap:5px;}
 .map-fallback strong{font-family:'Outfit',sans-serif;font-size:1rem;}
 .map-fallback span{font-family:'Outfit',sans-serif;font-size:.78rem;color:rgba(245,239,224,.62);line-height:1.5;}
+
+/* ── Featured offer + reviews ── */
+.offer-section{
+  position:relative;background:#2A0E02;
+  border-top:4px solid #7B3715;border-bottom:4px solid #7B3715;
+  background-image:
+    radial-gradient(circle at 10% 10%,rgba(232,112,10,.16),transparent 24%),
+    radial-gradient(circle at 85% 80%,rgba(196,146,74,.12),transparent 28%),
+    repeating-linear-gradient(90deg,rgba(255,224,164,.025) 0 1px,transparent 1px 18px);
+}
+.offer-panel{
+  display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);gap:clamp(28px,5vw,64px);
+  align-items:center;padding:clamp(24px,4vw,44px);
+  border:1px solid rgba(255,224,164,.18);border-radius:16px;
+  background:linear-gradient(135deg,rgba(61,26,0,.92),rgba(26,8,1,.96));
+  box-shadow:0 22px 60px rgba(16,5,0,.32),inset 0 0 0 1px rgba(255,230,180,.08);
+  overflow:hidden;
+}
+.offer-copy{position:relative;z-index:2;}
+.offer-tag{
+  display:inline-flex;margin-bottom:14px;padding:7px 11px;border-radius:999px;
+  font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase;
+  color:#FFDCA5;background:rgba(232,112,10,.14);border:1px solid rgba(232,112,10,.34);
+}
+.offer-copy h2{font-size:clamp(2rem,5vw,4rem);line-height:1.02;color:#F5EFE0;margin-bottom:18px;}
+.offer-copy p{
+  max-width:520px;font-family:'Outfit',sans-serif;font-size:1rem;line-height:1.72;
+  color:rgba(245,239,224,.78);margin-bottom:24px;
+}
+.offer-actions{display:flex;flex-wrap:wrap;gap:12px;}
+.offer-visual{position:relative;min-height:320px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,224,164,.18);}
+.offer-visual img{width:100%;height:100%;min-height:320px;display:block;object-fit:cover;object-position:center 68%;filter:saturate(1.06) contrast(1.04);}
+.offer-price{
+  position:absolute;right:14px;bottom:14px;width:92px;height:92px;border-radius:50%;
+  display:grid;place-items:center;background:#F5EFE0;color:#3D1A00;border:2px solid #E8700A;
+  box-shadow:0 12px 28px rgba(16,5,0,.38);transform:rotate(-5deg);
+}
+.offer-price span,.offer-price strong{display:block;text-align:center;font-family:'Outfit',sans-serif;}
+.offer-price span{font-size:.64rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#7A5235;}
+.offer-price strong{font-size:1.55rem;color:#E8700A;line-height:1;}
+.reviews-section{
+  background:
+    radial-gradient(circle at 8% 10%,rgba(122,82,53,.08),transparent 25%),
+    linear-gradient(180deg,#E9D3A9,#E4C894);
+  border-top:1px solid rgba(91,43,19,.18);
+}
+.reviews-head{max-width:760px;margin:0 auto;text-align:center;}
+.reviews-head>p{
+  margin:-20px auto 34px;max-width:620px;font-family:'Outfit',sans-serif;
+  color:#5A3520;line-height:1.7;font-size:.95rem;
+}
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.review-card{
+  position:relative;background:rgba(255,249,235,.84);border:1px solid rgba(83,37,15,.28);
+  border-radius:12px;padding:22px;box-shadow:0 10px 26px rgba(61,26,0,.1);
+}
+.review-card::before{
+  content:"";position:absolute;inset:7px;border:1px solid rgba(196,146,74,.18);border-radius:8px;pointer-events:none;
+}
+.review-stars{font-family:'Outfit',sans-serif;font-size:.82rem;letter-spacing:.08em;color:#E8700A;margin-bottom:12px;}
+.review-card p{font-family:'Outfit',sans-serif;font-size:.93rem;line-height:1.65;color:#4C2A17;margin-bottom:17px;}
+.review-card strong{font-family:'Outfit',sans-serif;font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:#7A5235;}
+.contact-mini-label{
+  display:inline-flex;margin-bottom:16px;padding:6px 10px;border-radius:999px;
+  font-family:'Outfit',sans-serif;font-size:.66rem;font-weight:850;letter-spacing:.13em;text-transform:uppercase;
+  color:#6B3016;background:rgba(232,112,10,.08);border:1px solid rgba(232,112,10,.22);
+}
+.contact-facts{display:grid;gap:8px;margin:0 0 22px;}
+.contact-facts span{
+  display:flex;justify-content:space-between;gap:14px;padding:10px 0;
+  border-top:1px solid rgba(216,201,168,.7);
+  font-family:'Outfit',sans-serif;font-size:.82rem;color:#6B4226;
+}
+.contact-facts strong{color:#3D1A00;}
+.reveal-card{
+  animation:card-rise 520ms cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes card-rise{
+  from{opacity:0;transform:translateY(14px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
 /* ── Buttons ── */
 .btn-orange{
@@ -1095,6 +1322,20 @@ a{text-decoration:none;}
   .featured-image{height:190px;}
 }
 @media(max-width:640px){
+  .quick-info-strip{width:100%;grid-template-columns:1fr 1fr;}
+  .quick-info-item{padding:13px 14px;gap:9px;}
+  .quick-info-item strong{font-size:.58rem;}
+  .quick-info-item div span{font-size:.76rem;}
+  .quick-info-index{font-size:.68rem;}
+  .quick-info-cta{grid-column:1/-1;padding:13px 18px;}
+  .offer-panel{grid-template-columns:1fr;padding:18px;border-radius:12px;}
+  .offer-copy h2{font-size:clamp(1.85rem,12vw,2.8rem);}
+  .offer-visual{min-height:250px;}
+  .offer-visual img{min-height:250px;}
+  .review-grid{grid-template-columns:1fr;gap:12px;}
+  .reviews-head>p{margin-top:-16px;margin-bottom:24px;font-size:.88rem;}
+  .contact-facts span{display:block;}
+  .contact-facts strong{display:block;margin-bottom:3px;}
   .western-section-bg{opacity:.36;background-position:center!important;}
   .western-section-overlay{background:rgba(244,224,184,.48);}
   .saloon-divider{width:min(100%,310px);height:32px;gap:8px;margin-bottom:0;}
@@ -1124,7 +1365,7 @@ a{text-decoration:none;}
 @media(prefers-reduced-motion:reduce){
   .saloon-mini-door,.saloon-divider-moustache,.nav-link,.nav-link::after,
   .btn-orange,.btn-orange::after,.btn-dark,.btn-dark::after,.btn-outline-dark,.btn-outline-dark::after,
-  .gallery-card img{transition:none!important;}
+  .gallery-card img,.reveal-card{transition:none!important;animation:none!important;}
   .mobile-touch-moustache{animation:none!important;opacity:.7;transform:translate(-50%,-50%) scale(1)!important;}
 }
 @media(hover:none),(pointer:coarse){
@@ -1150,6 +1391,10 @@ a{text-decoration:none;}
   .btn-orange:active::after,.btn-dark:active::after,.btn-outline-dark:active::after{opacity:.5;transform:scale(1);}
 }
 @media(max-width:979px){
+  .quick-info-strip{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .quick-info-cta{grid-column:1/-1;}
+  .offer-panel{grid-template-columns:1fr;}
+  .review-grid{grid-template-columns:1fr;}
   section[id]{scroll-margin-top:82px;}
   .header-bar{height:64px;grid-template-columns:1fr 78px 1fr;gap:10px;padding:0 clamp(18px,5vw,30px);}
   .header-center-logo{width:70px;height:70px;margin-top:3px;padding:5px;}
@@ -1208,11 +1453,14 @@ a{text-decoration:none;}
       <Header scrolled={scrolled}/>
       <main>
         <Hero/>
+        <InfoBar/>
         <FeaturedSection/>
         <MenuSection/>
+        <LimitedOffer/>
         <StudentSection/>
         <GallerySection/>
         <About/>
+        <ReviewsSection/>
         <Contact/>
       </main>
       <Footer/>
