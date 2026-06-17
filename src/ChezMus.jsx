@@ -207,35 +207,33 @@ function Header({scrolled}){
   const nav=[
     {l:"Accueil",h:"#accueil"},
     {l:"Menu",h:"#menu"},
-    {l:"Étudiant",h:"#etudiant"},
+    {l:"Menu Étudiant",h:"#etudiant"},
     {l:"Galerie",h:"#galerie"},
     {l:"L’esprit",h:"#histoire"},
     {l:"Contact",h:"#contact"},
   ];
+  const leftNav=nav.slice(0,3);
+  const rightNav=nav.slice(3);
   return(
-    <header style={{
-      position:"fixed",top:0,left:0,right:0,zIndex:200,
-      background:scrolled?"rgba(245,239,224,0.97)":"rgba(245,239,224,0.94)",
-      backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",
-      borderBottom:scrolled?`1px solid ${C.border}`:"1px solid transparent",
-      boxShadow:scrolled?"0 1px 18px rgba(61,26,0,0.08)":"none",
-      transition:"all .3s ease",
-    }}>
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"0 clamp(20px,5vw,52px)",display:"flex",alignItems:"center",justifyContent:"space-between",height:64}}>
-        <a href="#accueil" style={{display:"flex",alignItems:"center",gap:10,textDecoration:"none",flexShrink:0}}>
-          <div style={{width:40,height:40,borderRadius:"50%",background:"white",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden",boxShadow:"0 1px 6px rgba(61,26,0,0.14)"}}>
-            <img src={LOGO} alt="Chez Mus" style={{width:36,height:36,objectFit:"contain"}}/>
-          </div>
-          <div style={{lineHeight:1.15}}>
-            <div className="f-west" style={{fontSize:".88rem",color:C.brown}}>Chez Mus</div>
-            <div style={{fontFamily:"'Outfit',sans-serif",fontSize:".56rem",color:C.wood,letterSpacing:".2em",textTransform:"uppercase"}}>Burger · Kebab</div>
-          </div>
-        </a>
-        <nav className="desktop-nav">
-          {nav.map(n=><a key={n.h} href={n.h} className="nav-link">{n.l}</a>)}
+    <header className={`site-header ${scrolled?"is-scrolled":""}`}>
+      <div className="header-bar">
+        <nav className="desktop-nav header-nav-left" aria-label="Navigation principale gauche">
+          {leftNav.map(n=><a key={n.h} href={n.h} className="nav-link">{n.l}</a>)}
         </nav>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <a href="#contact" className="btn-orange header-cta" style={{padding:"8px 18px",fontSize:".78rem",borderRadius:7}}>Nous trouver</a>
+
+        <a href="#accueil" className="header-center-logo" aria-label="Retour à l’accueil Chez Mus">
+          <img src={LOGO} alt="Chez Mus"/>
+        </a>
+
+        <div className="header-right">
+          <nav className="desktop-nav header-nav-right" aria-label="Navigation principale droite">
+            {rightNav.map(n=><a key={n.h} href={n.h} className="nav-link">{n.l}</a>)}
+          </nav>
+          <a className="header-location" href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer">
+            <span aria-hidden="true">⌖</span>
+            Herstal
+          </a>
+          <a href="#menu" className="btn-orange header-cta">Voir le menu <span aria-hidden="true">→</span></a>
           <button className="hamburger" onClick={()=>setOpen(!open)} aria-label="Menu" aria-expanded={open} style={{display:"flex"}}>
             <span style={{display:"block",width:22,height:2,background:C.brown,borderRadius:1,transition:"all .2s",transform:open?"rotate(45deg) translateY(7px)":"none"}}/>
             <span style={{display:"block",width:17,height:2,background:C.brown,borderRadius:1,transition:"all .2s",opacity:open?0:1}}/>
@@ -259,7 +257,7 @@ function Header({scrolled}){
 /* ── HERO ────────────────────────────────────────────────────────── */
 function Hero(){
   return(
-    <section id="accueil" style={{paddingTop:64}}>
+    <section id="accueil" className="hero-section">
       <div className="hero-shell">
         <div
           className="hero-food-scene"
@@ -630,7 +628,7 @@ html{scroll-behavior:smooth;}
 body{min-width:320px;background:#E9D3A9;font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;color:#3D1A00;}
 #root,.App{width:100%;min-height:100%;max-width:none!important;margin:0!important;padding:0!important;border:none!important;background:#E9D3A9;}
 main,section,header,footer{width:100%;}
-section[id]{scroll-margin-top:76px;}
+section[id]{scroll-margin-top:92px;}
 img{max-width:100%;}
 a{text-decoration:none;}
 
@@ -649,9 +647,44 @@ a{text-decoration:none;}
   letter-spacing:.035em;
 }
 
+/* ── Header ── */
+.site-header{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(245,239,224,.96);
+  border-top:4px solid #231008;
+  border-bottom:1px solid rgba(83,37,15,.22);
+  box-shadow:0 2px 18px rgba(61,26,0,.08);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  transition:background 220ms cubic-bezier(.23,1,.32,1),box-shadow 220ms cubic-bezier(.23,1,.32,1);
+}
+.site-header.is-scrolled{background:rgba(245,239,224,.985);box-shadow:0 4px 20px rgba(61,26,0,.13);}
+.header-bar{
+  position:relative;max-width:1280px;height:72px;margin:0 auto;padding:0 clamp(18px,4vw,48px);
+  display:grid;grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr);align-items:center;gap:18px;
+}
+.header-center-logo{
+  grid-column:2;justify-self:center;align-self:start;z-index:4;
+  width:88px;height:88px;margin-top:5px;padding:6px;border-radius:50%;
+  display:grid;place-items:center;background:#F5EFE0;
+  border:2px solid rgba(61,26,0,.74);
+  box-shadow:0 8px 22px rgba(61,26,0,.18),inset 0 0 0 1px rgba(255,248,231,.72);
+}
+.header-center-logo img{width:100%;height:100%;object-fit:contain;display:block;border-radius:50%;}
+.header-right{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0;}
+.header-nav-left{justify-content:flex-start;}
+.header-nav-right{justify-content:flex-end;}
+.header-location{
+  display:none;align-items:center;gap:7px;flex:0 0 auto;
+  font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:800;letter-spacing:.045em;text-transform:uppercase;
+  color:#2A0E02;padding:8px 9px;border-radius:999px;
+}
+.header-location span{font-size:1.02rem;color:#3D1A00;line-height:1;}
+.header-location:hover{color:#C95808;background:rgba(232,112,10,.08);}
+.hero-section{padding-top:76px;}
+
 /* ── Hero ── */
 .hero-shell{
-  position:relative;min-height:clamp(680px,calc(100vh - 64px),850px);display:flex;align-items:stretch;
+  position:relative;min-height:clamp(680px,calc(100vh - 76px),850px);display:flex;align-items:stretch;
   overflow:hidden;isolation:isolate;background:#C99A63;border-bottom:8px solid #3D1A00;
 }
 .hero-shell::after{
@@ -857,11 +890,11 @@ a{text-decoration:none;}
 .btn-outline-dark:active{transform:scale(.97);}
 
 /* ── Nav ── */
-.desktop-nav{display:none;align-items:center;gap:2px;}
+.desktop-nav{display:none;align-items:center;gap:1px;min-width:0;}
 .nav-link{
   position:relative;
-  font-family:'Outfit',sans-serif;font-weight:500;font-size:.875rem;color:#3D1A00;
-  padding:6px 14px 10px;border-radius:6px;letter-spacing:.04em;
+  font-family:'Outfit',sans-serif;font-weight:850;font-size:.8rem;color:#2A0E02;
+  padding:9px 10px 13px;border-radius:6px;letter-spacing:.055em;text-transform:uppercase;white-space:nowrap;
   transition:color 180ms cubic-bezier(.23,1,.32,1),transform 180ms cubic-bezier(.23,1,.32,1);
 }
 .nav-link::after{
@@ -872,9 +905,11 @@ a{text-decoration:none;}
 }
 .nav-link:hover{color:#C95808;transform:translateY(-1px);}
 .nav-link:hover::after{opacity:.9;transform:translate(-50%,0) scale(1);}
-.header-cta{display:none;}
+.header-cta{display:none;padding:10px 18px;border-radius:999px;font-size:.78rem;white-space:nowrap;gap:8px;}
+.header-cta span{font-size:.95rem;line-height:1;transition:transform 180ms cubic-bezier(.23,1,.32,1);}
+.header-cta:hover span{transform:translateX(3px);}
 .hamburger{background:none;border:none;cursor:pointer;padding:4px 2px;display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
-.mobile-menu{background:#F5EFE0;border-top:1px solid rgba(196,146,74,.2);padding:16px clamp(20px,5vw,52px) 24px;}
+.mobile-menu{background:#F5EFE0;border-top:1px solid rgba(196,146,74,.2);padding:18px clamp(20px,5vw,52px) 24px;box-shadow:0 14px 26px rgba(61,26,0,.12);}
 .mobile-link{display:block;font-family:'Outfit',sans-serif;font-weight:500;font-size:.95rem;color:#3D1A00;padding:12px 0;border-bottom:1px solid #EDE4CE;}
 
 /* ── Menu tabs ── */
@@ -1034,6 +1069,7 @@ a{text-decoration:none;}
   .mc{grid-template-columns:1fr 1fr;gap:0 48px;}
 }
 @media(min-width:980px){
+  .header-location{display:inline-flex;}
   .header-cta{display:inline-flex;}
   .desktop-nav{display:flex!important;}
   .hamburger{display:none!important;}
@@ -1114,6 +1150,12 @@ a{text-decoration:none;}
   .btn-orange:active::after,.btn-dark:active::after,.btn-outline-dark:active::after{opacity:.5;transform:scale(1);}
 }
 @media(max-width:979px){
+  section[id]{scroll-margin-top:82px;}
+  .header-bar{height:64px;grid-template-columns:1fr 78px 1fr;gap:10px;padding:0 clamp(18px,5vw,30px);}
+  .header-center-logo{width:70px;height:70px;margin-top:3px;padding:5px;}
+  .header-right{grid-column:3;}
+  .header-location{display:none;}
+  .hero-section{padding-top:68px;}
   .hero-shell{min-height:clamp(650px,92svh,790px);display:flex;align-items:stretch;}
   .hero-food-scene{
     position:absolute;inset:0;z-index:1;width:100%;height:100%;
