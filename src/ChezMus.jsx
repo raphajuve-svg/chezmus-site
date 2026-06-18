@@ -808,13 +808,648 @@ function Footer(){
 }
 
 /* ── APP ─────────────────────────────────────────────────────────── */
+const REF_HERO_WIDE = "/images/home-food-hero.png";
+const REF_HERO_MOBILE = "/images/home-food-hero-mobile.png";
+
+const REF_FEATURED = [
+  {
+    name: "Le Mus Burger",
+    label: "Le favori",
+    image: howdyImage,
+    desc: "Steak smashé, cheddar, bacon grillé, oignons caramélisés, sauce maison.",
+    price: "12,90 €",
+    position: "50% 68%",
+  },
+  {
+    name: "Kebab Grillé",
+    label: "Bien grillé",
+    image: kebabAdanaImage,
+    desc: "Viande grillée, crudités fraîches, sauce au choix, servi avec frites.",
+    price: "9,90 €",
+    position: "50% 62%",
+  },
+  {
+    name: "Le Double Cheese",
+    label: "Bien chargé",
+    image: buffaloImage,
+    desc: "Double steak, double cheddar, pickles, oignons, sauce maison.",
+    price: "14,90 €",
+    position: "50% 68%",
+  },
+  {
+    name: "Kebab Tacos",
+    label: "À tester",
+    image: kebabDurumAdanaImage,
+    desc: "Viande grillée, sauce fromagère, frites, sauce maison.",
+    price: "11,90 €",
+    position: "50% 54%",
+  },
+];
+
+const REF_MENU_GROUPS = [
+  {
+    tab: "Burgers",
+    items: [
+      { name: "Le Howdy", desc: "Steak de bœuf, sauce burger, cheddar, cornichons, oignons caramélisés.", price: "7,50 €", menu: "11 €" },
+      { name: "Le Dermano", desc: "Steak de bœuf, sauce BBQ, cheddar, bacon, aubergine grillée.", price: "8,50 €", menu: "12 €" },
+      { name: "Le Buffalo", desc: "Double steak, sauce BBQ, cheddar, bacon, cornichons.", price: "9,50 €", menu: "13 €" },
+      { name: "Le Pêcheur", desc: "Poisson pané, sauce tartare, cheddar, oignons rouges, salade.", price: "7,50 €", menu: "11 €" },
+    ],
+  },
+  {
+    tab: "Kebabs",
+    items: [
+      { name: "Adana", desc: "Brochette hachis de bœuf piquant, crudités et sauce au choix.", price: "9 €", menu: "13,50 €" },
+      { name: "Poulet", desc: "Brochette de poulet mariné, crudités fraîches et sauce maison.", price: "8 €", menu: "12,50 €" },
+      { name: "Dürüm poulet", desc: "Dürüm grillé, poulet mariné, crudités et sauce au choix.", price: "8 €", menu: "12,50 €" },
+      { name: "Dürüm Adana", desc: "Adana grillé en dürüm, généreux et servi bien chaud.", price: "9 €", menu: "13,50 €" },
+    ],
+  },
+  {
+    tab: "Menus",
+    items: [
+      { name: "Menu étudiant", desc: "Burger menu ou dürüm kebab, frites et canette offerte.", price: "Dès 7,90 €", menu: "Carte étudiante" },
+      { name: "Menu burger", desc: "Burger au choix, frites croustillantes et boisson 33cl.", price: "+3,50 €", menu: "Complet" },
+      { name: "Menu kebab", desc: "Kebab ou dürüm, frites, boisson et sauce au choix.", price: "+4,50 €", menu: "Complet" },
+      { name: "Ayran maison", desc: "Ayran frais préparé maison, parfait avec le kebab grillé.", price: "3 €", menu: "Boisson" },
+    ],
+  },
+];
+
+const REF_GALLERY = [
+  { src: howdyFullImage, alt: "Burger Howdy Chez Mus", position: "50% 66%" },
+  { src: kebabDurumAdanaImage, alt: "Dürüm kebab Adana Chez Mus", position: "50% 54%" },
+  { src: kebabAdanaAyranImage, alt: "Kebab Adana avec ayran fait maison Chez Mus", position: "50% 56%" },
+  { src: durumPouletImage, alt: "Dürüm poulet Chez Mus", position: "50% 62%" },
+  { src: dermanoFullImage, alt: "Le Dermano Chez Mus", position: "50% 66%" },
+  { src: cowBoyImage, alt: "Burger Le Cow-Boy Chez Mus", position: "50% 58%" },
+  { src: pecheurImage, alt: "Burger Le Pêcheur Chez Mus", position: "50% 66%" },
+  { src: kebabAdanaImage, alt: "Kebab Adana grillé Chez Mus", position: "50% 62%" },
+];
+
+function RefIcon({type}){
+  const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" };
+  if(type === "clock") return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" {...common}/><path d="M12 7v5l3.5 2" {...common}/></svg>;
+  if(type === "pin") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-5.2 7-12a7 7 0 0 0-14 0c0 6.8 7 12 7 12Z" {...common}/><circle cx="12" cy="9" r="2.5" {...common}/></svg>;
+  if(type === "phone") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 4.5 10 7l-1.7 2.2a12.7 12.7 0 0 0 6.5 6.5L17 14l2.5 2.5-1.2 2.7c-.4.8-1.2 1.2-2.1 1-6.1-1.2-11-6.1-12.2-12.2-.2-.9.2-1.8 1-2.1l2.5-1.4Z" {...common}/></svg>;
+  if(type === "bag") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z" {...common}/><path d="M9 8a3 3 0 0 1 6 0" {...common}/></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" {...common}/></svg>;
+}
+
+function RefHeader(){
+  const [open,setOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.toggle("ref-menu-open", open);
+    return () => document.body.classList.remove("ref-menu-open");
+  }, [open]);
+
+  useEffect(() => {
+    if(!open) return undefined;
+    const close = (event) => {
+      if(event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, [open]);
+
+  const nav = [
+    ["Accueil", "#accueil"],
+    ["Menu", "#menu"],
+    ["Menu étudiant", "#etudiant"],
+    ["Galerie", "#galerie"],
+    ["L’esprit Chez Mus", "#histoire"],
+    ["Contact", "#contact"],
+  ];
+
+  return(
+    <header className="ref-header">
+      <nav className="ref-nav" aria-label="Navigation principale">
+        <div className="ref-nav-side ref-nav-left">
+          {nav.slice(0,3).map(([label, href]) => (
+            <a key={label} href={href}>{label}</a>
+          ))}
+        </div>
+        <a className="ref-logo-mark" href="#accueil" aria-label="Accueil Chez Mus">
+          <img src={LOGO} alt="Chez Mus Burger Kebab" />
+        </a>
+        <div className="ref-nav-side ref-nav-right">
+          {nav.slice(3).map(([label, href]) => (
+            <a key={label} href={href}>{label}</a>
+          ))}
+        </div>
+        <a className="ref-header-cta" href="#menu">Voir le menu <span>→</span></a>
+        <button className="ref-menu-toggle" type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="ref-mobile-menu">
+          <span></span><span></span><span></span>
+          <em>{open ? "Fermer" : "Menu"}</em>
+        </button>
+      </nav>
+      <div id="ref-mobile-menu" className={`ref-mobile-menu ${open ? "is-open" : ""}`}>
+        {nav.map(([label, href]) => (
+          <a key={label} href={href} onClick={() => setOpen(false)}>{label}</a>
+        ))}
+        <a className="ref-mobile-order" href="#contact" onClick={() => setOpen(false)}>Itinéraire</a>
+      </div>
+    </header>
+  );
+}
+
+function RefHero(){
+  return(
+    <section id="accueil" className="ref-hero" style={{ "--hero-wide": `url(${REF_HERO_WIDE})`, "--hero-mobile": `url(${REF_HERO_MOBILE})` }}>
+      <div className="ref-wood-corner ref-wood-corner-left" aria-hidden="true"></div>
+      <div className="ref-hero-buffalo" aria-hidden="true"></div>
+      <div className="ref-hero-food" aria-hidden="true"></div>
+      <div className="ref-hero-wash" aria-hidden="true"></div>
+      <div className="ref-hero-inner">
+        <div className="ref-hero-copy">
+          <p className="ref-kicker"><span>★</span> Herstal · 100% Halal · Since 2026 <span>★</span></p>
+          <h1>Des burgers généreux et des kebabs grillés <strong>à Herstal</strong></h1>
+          <p className="ref-hero-text">Le saloon burger-kebab de Herstal : burgers bien garnis, kebabs grillés, menus étudiants et caractère cowboy.</p>
+          <div className="ref-hero-actions">
+            <a className="ref-btn ref-btn-primary" href="#menu">Voir le menu <span>→</span></a>
+            <a className="ref-btn ref-btn-secondary" href="#contact"><RefIcon type="pin"/> Commander</a>
+          </div>
+          <a className="ref-student-small" href="#etudiant">Menu étudiant <span>→</span></a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RefInfoBar(){
+  const info = [
+    { icon: "clock", label: "Horaires", value: "Bientôt disponibles" },
+    { icon: "pin", label: "Adresse", value: "Rue Elisa Dumonceau 69, 4040 Herstal" },
+    { icon: "phone", label: "Téléphone", value: "Bientôt disponible" },
+    { icon: "bag", label: "Service", value: "Sur place & à emporter" },
+  ];
+  return(
+    <section className="ref-info-bar" aria-label="Informations pratiques">
+      <div className="ref-info-inner">
+        {info.map((item) => (
+          <div className="ref-info-item" key={item.label}>
+            <RefIcon type={item.icon}/>
+            <div>
+              <strong>{item.label}</strong>
+              <span>{item.value}</span>
+            </div>
+          </div>
+        ))}
+        <a className="ref-info-cta" href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer">Itinéraire <span>→</span></a>
+      </div>
+    </section>
+  );
+}
+
+function RefSectionTitle({eyebrow, title, light = false}){
+  return(
+    <div className={`ref-section-title ${light ? "is-light" : ""}`}>
+      <div className="ref-title-ornament" aria-hidden="true">
+        <span></span>
+        <MoustacheMark/>
+        <span></span>
+      </div>
+      {eyebrow && <p>{eyebrow}</p>}
+      <h2>{title}</h2>
+    </div>
+  );
+}
+
+function RefFeatured(){
+  const tabs = ["Burgers", "Kebabs", "Wraps", "Menus", "Accompagnements", "Boissons"];
+  return(
+    <section id="incontournables" className="ref-section ref-featured-section">
+      <div className="ref-western-layer" aria-hidden="true"></div>
+      <div className="ref-wrap">
+        <RefSectionTitle eyebrow="Nos incontournables" title="Nos incontournables" />
+        <div className="ref-tabs" aria-label="Catégories populaires">
+          {tabs.map((tab, index) => <button key={tab} type="button" className={index === 0 ? "is-active" : ""}>{tab}</button>)}
+        </div>
+        <div className="ref-product-grid">
+          {REF_FEATURED.map((item) => (
+            <article className="ref-product-card" key={item.name}>
+              <div className="ref-card-media">
+                <img src={item.image} alt={item.name} style={{ objectPosition: item.position }} />
+                <span>{item.label}</span>
+              </div>
+              <div className="ref-card-copy">
+                <h3>{item.name}</h3>
+                <p>{item.desc}</p>
+                <strong>{item.price}</strong>
+                <div className="ref-card-star" aria-hidden="true"><span></span>★<span></span></div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="ref-center">
+          <a className="ref-btn ref-btn-ghost" href="#menu">Voir toute la carte <span>→</span></a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RefMenu(){
+  const [active,setActive] = useState(0);
+  const group = REF_MENU_GROUPS[active];
+  return(
+    <section id="menu" className="ref-section ref-menu-section">
+      <div className="ref-wrap">
+        <RefSectionTitle eyebrow="Notre menu" title="La carte du saloon" />
+        <div className="ref-menu-board">
+          <div className="ref-menu-tabs" role="tablist" aria-label="Sections du menu">
+            {REF_MENU_GROUPS.map((menu, index) => (
+              <button key={menu.tab} type="button" className={active === index ? "is-active" : ""} onClick={() => setActive(index)}>
+                {menu.tab}
+              </button>
+            ))}
+          </div>
+          <div className="ref-menu-list">
+            {group.items.map((item) => (
+              <article className="ref-menu-row" key={item.name}>
+                <div>
+                  <h3>{item.name}</h3>
+                  <p>{item.desc}</p>
+                </div>
+                <div className="ref-menu-price">
+                  <strong>{item.price}</strong>
+                  <span>{item.menu}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RefStudent(){
+  return(
+    <section id="etudiant" className="ref-section ref-student-section">
+      <div className="ref-western-layer" aria-hidden="true"></div>
+      <div className="ref-wrap">
+        <RefSectionTitle eyebrow="Menu étudiant" title="Le chef cowboy est devenu fou !" />
+        <div className="ref-student-banner">
+          <div className="ref-cowboy-panel" aria-hidden="true">
+            <div className="ref-cowboy-hat"></div>
+            <div className="ref-cowboy-face">
+              <MoustacheMark/>
+            </div>
+            <div className="ref-cowboy-badge">Student<br/>Deal</div>
+          </div>
+          <div className="ref-student-copy">
+            <span>Menu étudiant</span>
+            <h3>Le meilleur prix pour les étudiants</h3>
+            <p>Disponible du lundi au vendredi, jours scolaires, de 12h à 18h. Burger menu ou dürüm kebab, canette offerte, sur présentation d’une carte étudiante valide.</p>
+            <a className="ref-btn ref-btn-primary" href="#contact">Découvrir le menu étudiant <span>→</span></a>
+          </div>
+          <div className="ref-student-photo">
+            <img src={studentMenuImage} alt="Menu étudiant Chez Mus avec burger, frites et boisson" />
+          </div>
+          <div className="ref-price-badge"><small>Dès</small>7,90€</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RefGallery(){
+  return(
+    <section id="galerie" className="ref-section ref-gallery-section">
+      <div className="ref-wrap">
+        <RefSectionTitle eyebrow="Galerie" title="Nos meilleures photos" light />
+        <div className="ref-gallery-grid">
+          {REF_GALLERY.map((image, index) => (
+            <figure key={`${image.alt}-${index}`}>
+              <img src={image.src} alt={image.alt} style={{ objectPosition: image.position }} loading="lazy" />
+            </figure>
+          ))}
+        </div>
+        <div className="ref-center">
+          <a className="ref-btn ref-btn-wood-outline" href="https://instagram.com/chezmusburger" target="_blank" rel="noreferrer">Voir toute la galerie <span>→</span></a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RefSpiritContact(){
+  return(
+    <section id="histoire" className="ref-spirit-contact">
+      <div className="ref-western-layer" aria-hidden="true"></div>
+      <div className="ref-wrap ref-spirit-grid">
+        <article className="ref-spirit-card">
+          <p className="ref-card-eyebrow">★ L’esprit Chez Mus</p>
+          <h2>Plus qu’un restaurant, une identité</h2>
+          <p>Chez Mus, c’est un spot local avec du caractère : burgers généreux, kebabs grillés, menus étudiants et une vraie identité western portée avec énergie.</p>
+          <div className="ref-trust-tags">
+            <span>100% Halal</span>
+            <span>Burgers généreux</span>
+            <span>Kebab grillé</span>
+            <span>Since 2026</span>
+          </div>
+          <a className="ref-btn ref-btn-secondary" href="#menu">Découvrir la carte <span>→</span></a>
+        </article>
+        <article id="contact" className="ref-contact-card">
+          <p className="ref-card-eyebrow">★ Contactez-nous</p>
+          <h2>On est là pour vous</h2>
+          <ul>
+            <li><RefIcon type="pin"/> Rue Elisa Dumonceau 69, 4040 Herstal</li>
+            <li><RefIcon type="phone"/> Bientôt disponible</li>
+            <li><RefIcon type="bag"/> Sur place & à emporter</li>
+          </ul>
+          <div className="ref-contact-actions">
+            <a className="ref-btn ref-btn-primary" href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer">Itinéraire <span>→</span></a>
+            <a className="ref-social-pill" href="https://instagram.com/chezmusburger" target="_blank" rel="noreferrer">Instagram</a>
+            <a className="ref-social-pill" href="https://www.tiktok.com/search?q=chezmusburger" target="_blank" rel="noreferrer">TikTok</a>
+          </div>
+          <div className="ref-map-mini">
+            <MapboxMap/>
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function RefFooter(){
+  return(
+    <footer className="ref-footer">
+      <div className="ref-footer-inner">
+        <a href="#accueil" className="ref-footer-logo">
+          <img src={LOGO} alt="Chez Mus Burger Kebab" />
+        </a>
+        <div className="ref-footer-center">
+          <MoustacheMark/>
+          <p>Herstal · 100% Halal · Since 2026</p>
+          <small>© 2026 Chez Mus — Tous droits réservés.</small>
+        </div>
+        <div className="ref-footer-links">
+          <a href="#contact">Mentions légales</a>
+          <a href="#contact">Politique de confidentialité</a>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function ReferenceHomepage(){
+  return(
+    <div className="ref-page">
+      <RefHeader/>
+      <main>
+        <RefHero/>
+        <RefInfoBar/>
+        <RefFeatured/>
+        <RefMenu/>
+        <RefStudent/>
+        <RefGallery/>
+        <RefSpiritContact/>
+      </main>
+      <RefFooter/>
+      <MobileMoustacheTap/>
+    </div>
+  );
+}
+
+const referenceStyles = `
+.ref-page{
+  --cream:#f5e4bf;--paper:#ead09a;--paper-soft:#f2ddb2;--ink:#281006;--brown:#4a2108;--brown-2:#6d3615;--orange:#d85a07;--gold:#d59b49;--wood:#241007;--line:rgba(75,32,8,.22);
+  min-width:320px;color:var(--ink);background:radial-gradient(circle at 50% 0%,rgba(255,240,202,.7),transparent 44%),linear-gradient(180deg,#ebd2a0 0%,#dfbd80 100%);
+  overflow-x:hidden;font-family:'Outfit',sans-serif;
+}
+.ref-page *{box-sizing:border-box;}
+.ref-page a{color:inherit;text-decoration:none;}
+.ref-page img{display:block;max-width:100%;}
+.ref-wrap{position:relative;z-index:2;width:min(1180px,calc(100% - 42px));margin:0 auto;}
+.ref-center{display:flex;justify-content:center;}
+.ref-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 28px;border-radius:8px;border:1px solid transparent;font-family:'Outfit',sans-serif;font-weight:900;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;transition:transform 180ms cubic-bezier(.23,1,.32,1),box-shadow 180ms cubic-bezier(.23,1,.32,1),background 180ms cubic-bezier(.23,1,.32,1);}
+.ref-btn:hover{transform:translateY(-2px);}
+.ref-btn-primary{color:#fff;background:linear-gradient(180deg,#e86b0b,#c74805);box-shadow:0 12px 24px rgba(144,54,6,.22),inset 0 1px 0 rgba(255,255,255,.2);}
+.ref-btn-primary:hover{box-shadow:0 16px 30px rgba(144,54,6,.28),inset 0 1px 0 rgba(255,255,255,.25);}
+.ref-btn-secondary{color:var(--ink);background:rgba(245,224,184,.38);border-color:rgba(67,27,7,.42);box-shadow:inset 0 1px 0 rgba(255,255,255,.24);}
+.ref-btn-secondary svg{width:18px;height:18px;color:#9b4b15;}
+.ref-btn-ghost{color:var(--brown);background:rgba(255,241,205,.34);border-color:rgba(69,28,8,.38);}
+.ref-btn-wood-outline{color:#f5dfad;background:rgba(74,33,8,.18);border-color:rgba(213,155,73,.7);}
+.ref-header{position:fixed;top:0;left:0;right:0;z-index:90;height:88px;background:linear-gradient(90deg,rgba(243,223,184,.96),rgba(255,239,207,.97),rgba(242,219,177,.96)),radial-gradient(circle at 50% 0%,rgba(255,255,255,.5),transparent 60%);border-top:7px solid #201006;border-bottom:1px solid rgba(55,21,5,.28);box-shadow:0 8px 26px rgba(49,19,4,.12);}
+.ref-nav{position:relative;height:100%;width:min(1180px,calc(100% - 44px));margin:0 auto;display:grid;grid-template-columns:1fr 128px 1fr auto;align-items:center;gap:18px;}
+.ref-nav-side{display:flex;align-items:center;gap:clamp(16px,2.6vw,34px);}
+.ref-nav-side a{position:relative;font-family:'Rye',serif;font-size:.8rem;letter-spacing:.015em;padding:10px 0;text-transform:uppercase;}
+.ref-nav-side a::after{content:"";position:absolute;left:50%;right:50%;bottom:5px;height:2px;background:var(--orange);transition:left 170ms ease,right 170ms ease;}
+.ref-nav-side a:hover::after{left:0;right:0;}
+.ref-nav-right{justify-content:flex-start;}
+.ref-logo-mark{justify-self:center;align-self:start;width:116px;height:116px;margin-top:10px;padding:8px;border-radius:999px;background:linear-gradient(180deg,#fff1ca,#e6bf78);border:3px solid rgba(73,31,9,.78);box-shadow:0 13px 26px rgba(54,23,6,.28),inset 0 0 0 2px rgba(255,255,255,.48);display:grid;place-items:center;}
+.ref-logo-mark img{width:100%;height:100%;object-fit:contain;border-radius:999px;}
+.ref-header-cta{justify-self:end;display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 24px;border-radius:8px;background:linear-gradient(180deg,#e46a0a,#c64804);color:#fff;font-weight:900;text-transform:uppercase;font-size:.74rem;box-shadow:0 9px 18px rgba(147,55,7,.2);}
+.ref-menu-toggle{display:none;}
+.ref-mobile-menu{display:none;}
+.ref-hero{position:relative;min-height:640px;padding-top:88px;overflow:hidden;isolation:isolate;background:linear-gradient(180deg,rgba(242,218,172,.98),rgba(222,184,123,.95)),var(--paper);border-bottom:8px solid #2d1307;}
+.ref-hero::before{content:"";position:absolute;inset:88px 0 0;z-index:0;opacity:.44;background:radial-gradient(circle at 18% 25%,rgba(255,248,219,.78),transparent 33%),radial-gradient(circle at 70% 45%,rgba(119,64,22,.2),transparent 45%),linear-gradient(90deg,rgba(87,42,13,.12),transparent 28%,rgba(87,42,13,.12));}
+.ref-wood-corner{position:absolute;z-index:4;pointer-events:none;background:repeating-linear-gradient(8deg,rgba(255,214,128,.05) 0 3px,transparent 3px 8px),linear-gradient(135deg,#522509,#1e0c03 70%);box-shadow:0 14px 34px rgba(39,16,4,.22);}
+.ref-wood-corner-left{width:300px;height:112px;left:-72px;top:88px;transform:rotate(-22deg);transform-origin:left top;clip-path:polygon(0 0,100% 0,83% 45%,0 76%);}
+.ref-hero-buffalo{position:absolute;inset:88px 0 0;z-index:1;opacity:.18;background-image:url(${westernSectionBackground});background-size:cover;background-position:right top;mix-blend-mode:multiply;}
+.ref-hero-food{position:absolute;left:0;right:0;bottom:-16px;z-index:3;height:calc(100% - 88px);background-image:var(--hero-wide);background-repeat:no-repeat;background-size:auto 100%;background-position:calc(100% + 150px) bottom;filter:drop-shadow(0 24px 30px rgba(41,16,3,.28));}
+.ref-hero-food::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(232,201,144,1) 0%,rgba(232,201,144,.96) 27%,rgba(232,201,144,.48) 39%,rgba(232,201,144,0) 51%);pointer-events:none;}
+.ref-hero-wash{position:absolute;inset:88px 0 0;z-index:2;pointer-events:none;background:linear-gradient(90deg,rgba(236,204,151,.98) 0%,rgba(236,203,148,.95) 30%,rgba(232,194,135,.68) 47%,rgba(232,194,135,.12) 62%,rgba(55,20,4,.04) 100%),linear-gradient(180deg,transparent 60%,rgba(41,16,3,.18) 100%);}
+.ref-hero-inner{position:relative;z-index:5;width:min(1180px,calc(100% - 44px));margin:0 auto;min-height:552px;display:flex;align-items:center;}
+.ref-hero-copy{width:min(48%,540px);padding-top:16px;}
+.ref-kicker{margin:0 0 22px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;color:#bb4c09;font-size:.83rem;}
+.ref-kicker span{color:#8c4818;margin:0 7px;}
+.ref-hero h1{margin:0 0 20px;font-family:'Rye',serif;color:#2a0f04;font-size:clamp(2.9rem,4.7vw,4.45rem);line-height:1.05;letter-spacing:-.015em;text-transform:uppercase;text-wrap:balance;}
+.ref-hero h1 strong{display:inline;color:var(--orange);font-weight:400;}
+.ref-hero-text{width:min(480px,100%);margin:0 0 28px;color:#361606;font-size:1rem;line-height:1.65;font-weight:650;}
+.ref-hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:18px;}
+.ref-student-small{display:inline-flex;align-items:center;gap:9px;color:#af4309;border-bottom:2px solid rgba(175,67,9,.32);font-weight:900;font-size:.86rem;text-transform:uppercase;padding-bottom:6px;}
+.ref-info-bar{position:relative;z-index:6;margin-top:-2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 8px),linear-gradient(180deg,#3b1a08,#1b0902);color:#f5dfad;border-top:1px solid rgba(255,218,137,.18);border-bottom:1px solid rgba(0,0,0,.55);box-shadow:0 12px 26px rgba(42,17,4,.22);}
+.ref-info-inner{width:min(1180px,calc(100% - 44px));min-height:86px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr) auto;align-items:center;gap:0;}
+.ref-info-item{min-height:62px;display:flex;align-items:center;gap:16px;padding:0 22px;border-right:1px solid rgba(245,223,173,.19);}
+.ref-info-item:first-child{padding-left:0;}
+.ref-info-item svg{width:34px;height:34px;color:#d99b45;flex:0 0 auto;}
+.ref-info-item strong{display:block;color:#d99b45;font-family:'Rye',serif;font-size:.68rem;text-transform:uppercase;margin-bottom:6px;}
+.ref-info-item span{display:block;color:#fff3d4;font-weight:650;font-size:.86rem;line-height:1.35;}
+.ref-info-cta{margin-left:20px;display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 26px;border-radius:7px;background:linear-gradient(180deg,#df650a,#c34804);color:#fff;font-weight:900;text-transform:uppercase;font-size:.78rem;}
+.ref-section{position:relative;padding:56px 0;overflow:hidden;background:linear-gradient(180deg,#e7c990,#efd7a6);}
+.ref-featured-section{padding-top:52px;}
+.ref-western-layer{position:absolute;inset:0;z-index:0;opacity:.18;background-image:url(${westernSectionBackground});background-size:cover;background-position:center top;mix-blend-mode:multiply;pointer-events:none;}
+.ref-western-layer::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(239,216,168,.82),rgba(232,201,145,.9));}
+.ref-section-title{text-align:center;margin:0 auto 26px;color:var(--ink);}
+.ref-section-title.is-light{color:#f8e6be;}
+.ref-title-ornament{display:flex;align-items:center;justify-content:center;gap:13px;margin:0 auto 8px;width:min(220px,70vw);}
+.ref-title-ornament span{height:1px;flex:1;background:currentColor;opacity:.45;}
+.ref-title-ornament svg{width:42px;height:20px;fill:currentColor;opacity:.9;}
+.ref-section-title p{margin:0 0 4px;color:var(--orange);font-family:'Outfit',sans-serif;font-weight:950;text-transform:uppercase;letter-spacing:.13em;font-size:.82rem;}
+.ref-section-title.is-light p{color:#dba24f;}
+.ref-section-title h2{margin:0;font-family:'Rye',serif;text-transform:uppercase;font-size:clamp(2rem,3.8vw,3rem);line-height:1.05;text-wrap:balance;}
+.ref-tabs{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid rgba(72,30,8,.28);border-radius:10px 10px 0 0;overflow:hidden;background:rgba(248,226,185,.56);margin:0 auto -1px;max-width:1000px;}
+.ref-tabs button,.ref-menu-tabs button{appearance:none;border:0;background:transparent;color:var(--brown);font-family:'Rye',serif;text-transform:uppercase;font-size:.75rem;padding:17px 12px;cursor:pointer;border-right:1px solid rgba(72,30,8,.21);}
+.ref-tabs button:last-child,.ref-menu-tabs button:last-child{border-right:0;}
+.ref-tabs button.is-active,.ref-menu-tabs button.is-active{color:#fff;background:linear-gradient(180deg,#d95d07,#a73603);box-shadow:inset 0 1px 0 rgba(255,255,255,.17);}
+.ref-product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.ref-product-card{background:rgba(250,230,194,.78);border:1px solid rgba(72,30,8,.22);border-radius:8px;overflow:hidden;box-shadow:0 12px 26px rgba(65,29,9,.12),inset 0 1px 0 rgba(255,255,255,.28);transition:transform 180ms cubic-bezier(.23,1,.32,1),box-shadow 180ms cubic-bezier(.23,1,.32,1);}
+.ref-product-card:hover{transform:translateY(-5px);box-shadow:0 18px 34px rgba(65,29,9,.18);}
+.ref-card-media{position:relative;height:170px;overflow:hidden;background:#44200b;}
+.ref-card-media img{width:100%;height:100%;object-fit:cover;filter:saturate(1.05) contrast(1.03);}
+.ref-card-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(39,16,4,.25));}
+.ref-card-media span{position:absolute;left:12px;top:12px;z-index:2;padding:6px 10px;border-radius:999px;background:rgba(45,17,4,.78);color:#f8e2b2;font-weight:900;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;}
+.ref-card-copy{padding:18px 18px 14px;}
+.ref-card-copy h3{font-family:'Rye',serif;font-size:1.04rem;color:var(--ink);margin:0 0 9px;text-transform:uppercase;}
+.ref-card-copy p{min-height:64px;margin:0 0 13px;color:#4a2108;font-size:.91rem;line-height:1.45;font-weight:560;}
+.ref-card-copy strong{display:block;color:var(--orange);font-size:1.12rem;font-weight:950;margin-bottom:8px;}
+.ref-card-star{display:flex;align-items:center;gap:12px;color:#a96a28;font-size:.8rem;}
+.ref-card-star span{height:1px;flex:1;background:rgba(113,55,16,.28);}
+.ref-featured-section .ref-center{margin-top:22px;}
+.ref-menu-section{background:linear-gradient(180deg,#e7c78f,#edd6a5);}
+.ref-menu-board{background:linear-gradient(180deg,rgba(48,20,6,.94),rgba(30,10,2,.96)),repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 2px,transparent 2px 10px);border:1px solid rgba(245,223,173,.18);border-radius:16px;padding:22px;box-shadow:0 22px 46px rgba(55,22,5,.2),inset 0 0 0 1px rgba(255,255,255,.05);}
+.ref-menu-tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(245,223,173,.2);border-radius:10px;overflow:hidden;margin-bottom:18px;}
+.ref-menu-tabs button{color:#f5dfad;border-color:rgba(245,223,173,.18);}
+.ref-menu-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.ref-menu-row{display:flex;justify-content:space-between;gap:22px;padding:18px;border-radius:12px;background:rgba(246,222,177,.08);border:1px solid rgba(245,223,173,.14);}
+.ref-menu-row h3{font-family:'Rye',serif;color:#f9e4b8;font-size:1rem;margin:0 0 8px;text-transform:uppercase;}
+.ref-menu-row p{color:rgba(255,244,216,.78);font-size:.9rem;line-height:1.45;margin:0;}
+.ref-menu-price{flex:0 0 auto;text-align:right;color:#f9e4b8;}
+.ref-menu-price strong{display:block;color:#f3a13e;font-size:1.08rem;font-weight:950;}
+.ref-menu-price span{display:block;color:rgba(255,244,216,.62);font-size:.76rem;margin-top:5px;}
+.ref-student-section{padding-top:44px;}
+.ref-student-banner{position:relative;display:grid;grid-template-columns:240px minmax(0,1fr) 360px;align-items:center;gap:28px;min-height:298px;border:2px solid rgba(82,36,10,.38);border-radius:20px;padding:28px 32px;overflow:hidden;background:radial-gradient(circle at 76% 38%,rgba(230,94,7,.15),transparent 29%),linear-gradient(90deg,rgba(247,221,174,.88),rgba(226,189,125,.9));box-shadow:inset 0 0 0 1px rgba(255,255,255,.25),0 18px 38px rgba(62,26,7,.15);}
+.ref-student-banner::before{content:"";position:absolute;inset:0;opacity:.12;background-image:url(${westernSectionBackground});background-size:cover;background-position:center;mix-blend-mode:multiply;}
+.ref-cowboy-panel{position:relative;z-index:1;height:230px;border-radius:18px;background:radial-gradient(circle at 50% 60%,rgba(114,57,20,.16),transparent 56%),linear-gradient(180deg,rgba(255,239,207,.32),rgba(133,70,27,.12));border:1px solid rgba(89,42,13,.22);display:grid;place-items:center;}
+.ref-cowboy-hat{position:absolute;top:40px;width:130px;height:52px;border-radius:50% 50% 22% 22%;background:linear-gradient(180deg,#9a5d28,#4e2108);transform:rotate(-6deg);box-shadow:0 8px 0 #2b1003;}
+.ref-cowboy-face{position:absolute;top:82px;width:92px;height:92px;border-radius:50%;background:linear-gradient(180deg,#f0c887,#bb7b3e);border:3px solid #4d2108;box-shadow:0 10px 18px rgba(48,19,4,.18);}
+.ref-cowboy-face svg{position:absolute;width:70px;left:11px;bottom:19px;fill:#2a0f04;}
+.ref-cowboy-badge{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);padding:7px 13px;border-radius:999px;background:#3f1a06;color:#f9dfac;font-family:'Rye',serif;text-align:center;text-transform:uppercase;font-size:.72rem;line-height:1.2;}
+.ref-student-copy{position:relative;z-index:1;text-align:center;}
+.ref-student-copy>span{display:inline-flex;padding:8px 22px;margin-bottom:14px;background:#4b2108;color:#f7d08e;font-family:'Rye',serif;text-transform:uppercase;font-size:.95rem;box-shadow:0 4px 0 rgba(75,33,8,.18);}
+.ref-student-copy h3{font-family:'Rye',serif;text-transform:uppercase;font-size:clamp(2.1rem,4.4vw,3.7rem);line-height:1.02;color:#2a0f04;margin:0 0 12px;}
+.ref-student-copy h3::first-line{color:var(--orange);}
+.ref-student-copy p{max-width:520px;margin:0 auto 19px;color:#3d1a00;font-weight:650;line-height:1.52;}
+.ref-student-photo{position:relative;z-index:1;min-height:210px;border-radius:13px;overflow:hidden;border:1px solid rgba(82,36,10,.22);box-shadow:0 18px 28px rgba(62,26,7,.16);}
+.ref-student-photo img{width:100%;height:100%;object-fit:cover;object-position:center;}
+.ref-price-badge{position:absolute;right:18px;bottom:18px;z-index:3;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,#d46613,#9d3705);color:#fff;font-family:'Rye',serif;font-size:1.85rem;box-shadow:0 10px 24px rgba(72,30,8,.26),inset 0 0 0 2px rgba(255,240,205,.42);}
+.ref-price-badge small{display:block;font-family:'Outfit',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:-16px;}
+.ref-gallery-section{background:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 2px,transparent 2px 9px),linear-gradient(180deg,#2a1206,#140702);color:#f5dfad;padding:64px 0 68px;}
+.ref-gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:178px;gap:12px;}
+.ref-gallery-grid figure{position:relative;margin:0;border-radius:9px;overflow:hidden;border:1px solid rgba(221,162,79,.28);background:#1a0802;}
+.ref-gallery-grid figure.is-wide{grid-column:span 2;}
+.ref-gallery-grid img{width:100%;height:100%;object-fit:cover;filter:saturate(1.05) contrast(1.05);transition:transform 260ms cubic-bezier(.23,1,.32,1);}
+.ref-gallery-grid figure:hover img{transform:scale(1.045);}
+.ref-gallery-section .ref-center{margin-top:24px;}
+.ref-spirit-contact{position:relative;overflow:hidden;padding:64px 0 56px;background:linear-gradient(180deg,#e5c68c,#efd9aa);}
+.ref-spirit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start;}
+.ref-spirit-card,.ref-contact-card{position:relative;z-index:2;min-height:360px;padding:36px 36px;border-radius:18px;border:1px solid rgba(73,31,9,.26);background:rgba(248,226,185,.7);box-shadow:0 18px 36px rgba(57,23,5,.12),inset 0 1px 0 rgba(255,255,255,.28);}
+.ref-card-eyebrow{margin:0 0 12px;color:#b04708;font-weight:950;text-transform:uppercase;letter-spacing:.08em;}
+.ref-spirit-card h2,.ref-contact-card h2{font-family:'Rye',serif;text-transform:uppercase;font-size:clamp(1.75rem,3vw,2.55rem);line-height:1.08;margin:0 0 18px;color:#2a0f04;}
+.ref-spirit-card p:not(.ref-card-eyebrow){font-size:1rem;line-height:1.68;color:#3e1a06;font-weight:600;max-width:540px;margin-bottom:20px;}
+.ref-trust-tags{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 24px;}
+.ref-trust-tags span{padding:8px 12px;border-radius:999px;background:rgba(72,31,8,.09);border:1px solid rgba(72,31,8,.17);font-weight:850;font-size:.78rem;color:#4a2108;}
+.ref-contact-card ul{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:12px;}
+.ref-contact-card li{display:flex;align-items:center;gap:12px;font-weight:800;color:#3d1a00;}
+.ref-contact-card li svg{width:22px;height:22px;color:#9f4511;flex:0 0 auto;}
+.ref-contact-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.ref-social-pill{display:inline-flex;align-items:center;min-height:42px;padding:0 16px;border-radius:999px;border:1px solid rgba(70,30,8,.25);font-weight:900;background:rgba(255,238,199,.36);}
+.ref-map-mini{height:180px;border-radius:14px;overflow:hidden;border:1px solid rgba(70,30,8,.2);background:#3b1a08;}
+.ref-map-mini .mapbox-map,.ref-map-mini .mapboxgl-map,.ref-map-mini>div{height:100%;min-height:100%;}
+.ref-footer{background:linear-gradient(180deg,#201006,#100501);color:#f3d79c;border-top:1px solid rgba(245,223,173,.12);padding:28px 0;}
+.ref-footer-inner{width:min(1180px,calc(100% - 44px));margin:0 auto;display:grid;grid-template-columns:120px 1fr 220px;align-items:center;gap:24px;}
+.ref-footer-logo{width:72px;height:72px;border-radius:50%;overflow:hidden;background:#f2dbad;display:grid;place-items:center;border:1px solid rgba(245,223,173,.3);}
+.ref-footer-logo img{width:100%;height:100%;object-fit:contain;}
+.ref-footer-center{text-align:center;}
+.ref-footer-center svg{width:44px;height:22px;fill:#d89a45;margin:0 auto 4px;}
+.ref-footer-center p{margin:0 0 6px;font-family:'Rye',serif;text-transform:uppercase;letter-spacing:.06em;}
+.ref-footer-center small{color:rgba(245,223,173,.64);}
+.ref-footer-links{display:grid;gap:8px;justify-items:end;}
+.ref-footer-links a{color:rgba(245,223,173,.72);font-size:.82rem;}
+@media (max-width:1080px){
+  .ref-nav{grid-template-columns:1fr 112px auto;}
+  .ref-nav-side{display:none;}
+  .ref-header-cta{display:none;}
+  .ref-logo-mark{width:102px;height:102px;}
+  .ref-menu-toggle{display:inline-flex;justify-self:end;align-items:center;gap:8px;border:1px solid rgba(70,30,8,.3);border-radius:999px;background:rgba(255,239,203,.4);color:#2a0f04;padding:10px 14px;font-weight:900;text-transform:uppercase;}
+  .ref-menu-toggle span{display:block;width:16px;height:2px;background:currentColor;border-radius:999px;}
+  .ref-menu-toggle em{font-style:normal;font-size:.75rem;}
+  .ref-mobile-menu{display:grid;position:fixed;left:18px;right:18px;top:98px;z-index:95;gap:4px;padding:16px;border-radius:18px;background:#fff0cc;border:1px solid rgba(70,30,8,.26);box-shadow:0 24px 50px rgba(36,13,3,.22);transform:translateY(-12px);opacity:0;pointer-events:none;transition:transform 170ms ease,opacity 170ms ease;}
+  .ref-mobile-menu.is-open{transform:translateY(0);opacity:1;pointer-events:auto;}
+  .ref-mobile-menu a{padding:13px 14px;border-radius:12px;font-family:'Rye',serif;text-transform:uppercase;}
+  .ref-mobile-order{background:var(--orange);color:#fff!important;text-align:center;}
+  .ref-info-inner{grid-template-columns:repeat(2,1fr);padding:10px 0;}
+  .ref-info-item{border-right:0;border-bottom:1px solid rgba(245,223,173,.13);padding:14px 12px;}
+  .ref-info-cta{grid-column:1 / -1;justify-content:center;margin:12px 0 0;}
+  .ref-product-grid{grid-template-columns:repeat(2,1fr);}
+  .ref-student-banner{grid-template-columns:1fr 1fr;padding:28px;}
+  .ref-cowboy-panel{display:none;}
+  .ref-student-copy{text-align:left;}
+  .ref-spirit-grid{grid-template-columns:1fr;}
+}
+@media (max-width:760px){
+  .ref-wrap{width:min(100% - 28px,1180px);}
+  .ref-header{height:76px;border-top-width:5px;}
+  .ref-nav{width:calc(100% - 28px);grid-template-columns:1fr auto;height:76px;}
+  .ref-logo-mark{width:82px;height:82px;margin-top:8px;justify-self:start;}
+  .ref-hero{min-height:690px;padding-top:76px;}
+  .ref-hero::before,.ref-hero-buffalo,.ref-hero-wash{inset:76px 0 0;}
+  .ref-wood-corner-left{top:76px;width:210px;height:86px;left:-70px;}
+  .ref-hero-food{inset:76px 0 0;width:100%;height:auto;background-image:var(--hero-mobile);background-size:cover;background-position:center top;filter:none;}
+  .ref-hero-food::before{display:none;}
+  .ref-hero-wash{background:linear-gradient(180deg,rgba(238,207,156,.99) 0%,rgba(238,207,156,.95) 32%,rgba(238,207,156,.72) 50%,rgba(83,34,8,.22) 100%),linear-gradient(90deg,rgba(236,204,151,.95),rgba(236,204,151,.2));}
+  .ref-hero-inner{width:calc(100% - 28px);min-height:614px;align-items:flex-start;padding-top:54px;}
+  .ref-hero-copy{width:100%;padding-top:0;}
+  .ref-kicker{font-size:.7rem;line-height:1.5;margin-bottom:13px;letter-spacing:.09em;}
+  .ref-hero h1{font-size:clamp(1.98rem,10.4vw,2.72rem);max-width:92%;line-height:1.07;margin-bottom:14px;}
+  .ref-hero-text{font-size:.88rem;line-height:1.5;max-width:91%;margin-bottom:16px;}
+  .ref-hero-actions{gap:10px;margin-bottom:14px;}
+  .ref-hero-actions .ref-btn{min-height:44px;padding:0 17px;font-size:.7rem;}
+  .ref-student-small{font-size:.72rem;padding-bottom:4px;}
+  .ref-info-inner{width:calc(100% - 28px);grid-template-columns:1fr;}
+  .ref-info-item{padding:12px 0;}
+  .ref-info-item svg{width:28px;height:28px;}
+  .ref-info-item strong{font-size:.62rem;}
+  .ref-info-item span{font-size:.82rem;}
+  .ref-section{padding:42px 0;}
+  .ref-section-title{margin-bottom:18px;}
+  .ref-title-ornament{width:min(170px,70vw);gap:10px;}
+  .ref-section-title h2{font-size:clamp(1.7rem,9vw,2.25rem);}
+  .ref-section-title p{font-size:.7rem;letter-spacing:.09em;}
+  .ref-tabs{display:flex;overflow:auto;justify-content:flex-start;border-radius:10px;margin:0 -4px 12px;padding-bottom:0;}
+  .ref-tabs button{min-width:132px;padding:14px 12px;font-size:.68rem;}
+  .ref-product-grid{grid-template-columns:1fr;gap:14px;}
+  .ref-card-media{height:190px;}
+  .ref-card-copy p{min-height:auto;}
+  .ref-menu-board{padding:14px;border-radius:14px;}
+  .ref-menu-tabs button{font-size:.68rem;padding:14px 8px;}
+  .ref-menu-list{grid-template-columns:1fr;}
+  .ref-menu-row{padding:15px;gap:12px;}
+  .ref-menu-row h3{font-size:.9rem;}
+  .ref-menu-row p{font-size:.84rem;}
+  .ref-student-banner{grid-template-columns:1fr;padding:22px 18px 92px;text-align:center;}
+  .ref-student-copy{text-align:center;}
+  .ref-student-copy h3{font-size:clamp(2rem,10vw,2.7rem);}
+  .ref-student-copy p{font-size:.9rem;}
+  .ref-student-photo{min-height:210px;}
+  .ref-price-badge{right:50%;bottom:14px;transform:translateX(50%);width:84px;height:84px;font-size:1.45rem;}
+  .ref-gallery-section{padding:48px 0 52px;}
+  .ref-gallery-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:138px;gap:8px;}
+  .ref-gallery-grid figure.is-wide{grid-column:span 2;}
+  .ref-spirit-contact{padding:44px 0;}
+  .ref-spirit-card,.ref-contact-card{padding:24px 18px;border-radius:16px;}
+  .ref-spirit-card h2,.ref-contact-card h2{font-size:clamp(1.55rem,8vw,2.1rem);}
+  .ref-contact-actions .ref-btn{width:100%;}
+  .ref-map-mini{height:220px;}
+  .ref-footer-inner{width:calc(100% - 28px);grid-template-columns:1fr;justify-items:center;text-align:center;}
+  .ref-footer-links{justify-items:center;}
+}
+@media (max-width:380px){
+  .ref-hero{min-height:670px;}
+  .ref-hero-inner{min-height:594px;padding-top:48px;}
+  .ref-hero h1{font-size:2rem;}
+  .ref-hero-text{font-size:.86rem;}
+}
+@media (prefers-reduced-motion:reduce){
+  .ref-page *{scroll-behavior:auto!important;animation:none!important;transition:none!important;}
+}
+`;
+
 export default function ChezMus(){
-  const [scrolled,setScrolled]=useState(false);
-  useEffect(()=>{
-    const h=()=>setScrolled(window.scrollY>50);
-    window.addEventListener("scroll",h,{passive:true});
-    return()=>window.removeEventListener("scroll",h);
-  },[]);
   return(
     <>
       <style>{`
@@ -1740,22 +2375,8 @@ a:focus-visible,button:focus-visible{outline:3px solid rgba(232,112,10,.5);outli
 }
 @keyframes food-reveal-mobile{from{opacity:.38;transform:scale(1.04);}to{opacity:1;transform:scale(1);}}
 ` }</style>
-      <MobileMoustacheTap/>
-      <PageIntro/>
-      <Header scrolled={scrolled}/>
-      <main>
-        <Hero/>
-        <InfoBar/>
-        <FeaturedSection/>
-        <MenuSection/>
-        <LimitedOffer/>
-        <StudentSection/>
-        <GallerySection/>
-        <About/>
-        <ReviewsSection/>
-        <Contact/>
-      </main>
-      <Footer/>
+      <style>{referenceStyles}</style>
+      <ReferenceHomepage/>
     </>
   );
 }
