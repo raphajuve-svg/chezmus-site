@@ -63,7 +63,10 @@ export default function MapboxMap() {
         <div className="map-fallback-pin" aria-hidden="true">★</div>
         <div>
           <strong>Chez Mus · Herstal</strong>
-          <span>La carte interactive sera disponible prochainement.</span>
+          <span>Rue Elisa Dumonceau 69, 4040 Herstal</span>
+          <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer">
+            Ouvrir l’itinéraire
+          </a>
         </div>
       </div>
     );
