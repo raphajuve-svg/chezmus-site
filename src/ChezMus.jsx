@@ -1,9 +1,18 @@
 /* eslint-disable no-unused-vars -- legacy inline image sources are retained for existing sections */
 import { useState, useEffect, useRef } from "react";
 import howdyImage from "./assets/howdy-card.jpg";
+import howdyFullImage from "./assets/howdy.jpg";
 import dermanoImage from "./assets/dermano-card.jpg";
+import dermanoFullImage from "./assets/le-dermano.png";
 import buffaloImage from "./assets/buffalo-card.jpg";
+import buffaloFullImage from "./assets/buffalo.png";
 import adanaImage from "./assets/adana-card.jpg";
+import kebabAdanaImage from "./assets/Kebab_adana.jpg";
+import cowBoyImage from "./assets/le-cow-boy.png";
+import pecheurImage from "./assets/le-pecheur.png";
+import durumPouletImage from "./assets/durum-poulet.jpg";
+import kebabAdanaAyranImage from "./assets/kebab-adana-ayran.jpg";
+import kebabDurumAdanaImage from "./assets/kebab-durum-adana.png";
 import heroFoodImage from "./assets/Le burger Chez Mus.jpg";
 import studentMenuImage from "./assets/MENU étudiant.jpg";
 import westernSectionBackground from "./assets/fond-chezmus.jpg";
@@ -49,11 +58,16 @@ const FEATURED=[
 ];
 
 const GALLERY=[
-  {src:howdyImage,alt:"Burger Howdy Chez Mus",position:"50% 68%"},
-  {src:dermanoImage,alt:"Burger Dermano devant Chez Mus",position:"50% 68%"},
-  {src:buffaloImage,alt:"Burger Buffalo Chez Mus",position:"50% 67%"},
-  {src:adanaImage,alt:"Kebab Adana grillé Chez Mus",position:"50% 62%"},
-  {src:studentMenuImage,alt:"Menu étudiant Chez Mus avec burger et frites",position:"50% 58%"},
+  {src:heroFoodImage,alt:"Burger, dürüm et frites Chez Mus",position:"50% 52%"},
+  {src:howdyFullImage,alt:"Burger Howdy Chez Mus",position:"50% 66%"},
+  {src:dermanoFullImage,alt:"Burger Le Dermano devant l'enseigne Chez Mus",position:"50% 66%"},
+  {src:buffaloFullImage,alt:"Burger Buffalo Chez Mus",position:"50% 65%"},
+  {src:cowBoyImage,alt:"Burger Le Cow-Boy Chez Mus",position:"50% 58%"},
+  {src:pecheurImage,alt:"Burger Le Pêcheur Chez Mus",position:"50% 66%"},
+  {src:durumPouletImage,alt:"Dürüm poulet Chez Mus",position:"50% 63%"},
+  {src:kebabAdanaAyranImage,alt:"Kebab Adana avec ayran fait maison Chez Mus",position:"50% 56%"},
+  {src:kebabDurumAdanaImage,alt:"Dürüm kebab Adana Chez Mus",position:"50% 54%"},
+  {src:kebabAdanaImage,alt:"Kebab Adana grillé Chez Mus",position:"50% 62%"},
 ];
 
 const INFO_ITEMS=[
@@ -910,10 +924,10 @@ a{text-decoration:none;}
 .gallery-card img{width:100%;height:100%;display:block;object-fit:cover;transition:transform 420ms cubic-bezier(.22,1,.36,1),filter 300ms cubic-bezier(.22,1,.36,1);}
 .gallery-card:hover img{transform:scale(1.035);filter:saturate(1.08) contrast(1.02);}
 .gallery-card-1{grid-column:span 5;grid-row:span 2;}
-.gallery-card-2{grid-column:span 4;}
-.gallery-card-3{grid-column:span 3;}
-.gallery-card-4{grid-column:span 3;}
-.gallery-card-5{grid-column:span 4;}
+.gallery-card-2{grid-column:span 3;grid-row:span 2;}
+.gallery-card-3{grid-column:span 4;grid-row:span 2;}
+.gallery-card-4,.gallery-card-5,.gallery-card-6{grid-column:span 4;grid-row:span 2;}
+.gallery-card-7,.gallery-card-8,.gallery-card-9,.gallery-card-10{grid-column:span 3;grid-row:span 2;}
 .trust-tag{background:rgba(255,244,218,.58);color:#3D1A00;border:1px solid rgba(91,43,19,.32);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);}
 
 /* ── Western surfaces ── */
@@ -1355,7 +1369,7 @@ a{text-decoration:none;}
   .footer-address{flex-basis:100%;}
   .student-offers{grid-template-columns:1fr;}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:210px;gap:12px;}
-  .gallery-card-1,.gallery-card-2,.gallery-card-3,.gallery-card-4,.gallery-card-5{grid-column:auto;grid-row:auto;}
+  .gallery-card-1,.gallery-card-2,.gallery-card-3,.gallery-card-4,.gallery-card-5,.gallery-card-6,.gallery-card-7,.gallery-card-8,.gallery-card-9,.gallery-card-10{grid-column:auto;grid-row:auto;}
   .gallery-card-1{grid-column:1/-1;}
   .about-kicker{font-size:.62rem;letter-spacing:.06em;}
 }
