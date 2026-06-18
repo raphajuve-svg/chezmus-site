@@ -202,10 +202,10 @@ function SaloonDivider({light=false,variant=""}){
   );
 }
 
-function SectionTitle({children,sub,light=false,style,align="center",headingStyle,dividerVariant=""}){
+function SectionTitle({children,sub,light=false,style,align="center",headingStyle,dividerVariant="",decorative=true}){
   return(
     <div className={`section-title section-title-${align}`} style={{textAlign:align,marginBottom:"clamp(28px,4vw,42px)",...style}}>
-      <SaloonDivider light={light} variant={dividerVariant}/>
+      {decorative&&<SaloonDivider light={light} variant={dividerVariant}/>}
       <h2 className="f-west" style={{fontSize:"clamp(1.55rem,3.5vw,2.4rem)",color:light?C.cream:C.brown,letterSpacing:".015em",margin:"7px 0 5px",lineHeight:1.1,...headingStyle}}>
         {children}
       </h2>
@@ -241,6 +241,18 @@ function Header({scrolled}){
   ];
   const leftNav=nav.slice(0,3);
   const rightNav=nav.slice(3);
+  useEffect(()=>{
+    if(!open)return undefined;
+    const onKey=(event)=>{
+      if(event.key==="Escape")setOpen(false);
+    };
+    document.addEventListener("keydown",onKey);
+    document.body.classList.add("menu-open");
+    return()=>{
+      document.removeEventListener("keydown",onKey);
+      document.body.classList.remove("menu-open");
+    };
+  },[open]);
   return(
     <header className={`site-header ${scrolled?"is-scrolled":""}`}>
       <div className="header-bar">
@@ -261,22 +273,40 @@ function Header({scrolled}){
             Herstal
           </a>
           <a href="#menu" className="btn-orange header-cta">Voir le menu <span aria-hidden="true">→</span></a>
-          <button className="hamburger" onClick={()=>setOpen(!open)} aria-label="Menu" aria-expanded={open} style={{display:"flex"}}>
+          <button className="hamburger" onClick={()=>setOpen(!open)} aria-label={open?"Fermer le menu":"Ouvrir le menu"} aria-expanded={open} aria-controls="mobile-navigation" style={{display:"flex"}}>
             <span style={{display:"block",width:22,height:2,background:C.brown,borderRadius:1,transition:"all .2s",transform:open?"rotate(45deg) translateY(7px)":"none"}}/>
             <span style={{display:"block",width:17,height:2,background:C.brown,borderRadius:1,transition:"all .2s",opacity:open?0:1}}/>
             <span style={{display:"block",width:22,height:2,background:C.brown,borderRadius:1,transition:"all .2s",transform:open?"rotate(-45deg) translateY(-7px)":"none"}}/>
           </button>
         </div>
       </div>
-      {open&&(
-        <div className="mobile-menu">
-          {nav.map(n=><a key={n.h} href={n.h} className="mobile-link" onClick={()=>setOpen(false)}>{n.l}</a>)}
-          <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer"
-            className="btn-orange" style={{display:"flex",justifyContent:"center",marginTop:14,borderRadius:8}}>
-            Itinéraire
-          </a>
+      <div id="mobile-navigation" className={`mobile-menu ${open?"is-open":""}`} aria-hidden={!open}>
+        <div className="mobile-menu-doors" aria-hidden="true">
+          <span/>
+          <span/>
         </div>
-      )}
+        <div className="mobile-menu-panel">
+          <div className="mobile-menu-kicker">
+            <MoustacheMark/>
+            <span>Chez Mus · Herstal</span>
+          </div>
+          <nav aria-label="Navigation mobile">
+            {nav.map((n,index)=><a key={n.h} href={n.h} className="mobile-link" style={{transitionDelay:`${open?index*34:0}ms`}} onClick={()=>setOpen(false)}>{n.l}</a>)}
+          </nav>
+          <div className="mobile-menu-actions">
+            <a href="#menu" className="btn-orange" onClick={()=>setOpen(false)}>
+              Voir le menu <span aria-hidden="true">→</span>
+            </a>
+            <a href="#contact" className="btn-outline-dark" onClick={()=>setOpen(false)}>
+              Commander
+            </a>
+            <a href="https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal" target="_blank" rel="noreferrer"
+              className="mobile-menu-map" onClick={()=>setOpen(false)}>
+              Herstal · Itinéraire
+            </a>
+          </div>
+        </div>
+      </div>
     </header>
   );
 }
@@ -325,7 +355,7 @@ function InfoBar(){
             <span className="quick-info-index">{String(index+1).padStart(2,"0")}</span>
             <div>
               <strong>{item.label}</strong>
-              <span>{item.value}</span>
+              <span className={item.value.toLowerCase().includes("bientôt")?"is-secondary":""}>{item.value}</span>
             </div>
           </div>
         ))}
@@ -426,12 +456,12 @@ function MenuSection(){
     <section id="menu" className="sp menu-section">
       <div className="inner-m">
         <SectionTitle>Notre Menu</SectionTitle>
-        <div className="tab-bar">
+        <div className="tab-bar" role="tablist" aria-label="Catégories du menu">
           {TABS.map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)} className={`tab${tab===t.id?" active":""}`}>{t.lbl}</button>
+            <button key={t.id} type="button" role="tab" aria-selected={tab===t.id} onClick={()=>setTab(t.id)} className={`tab${tab===t.id?" active":""}`}>{t.lbl}</button>
           ))}
         </div>
-        <div className="menu-board" style={{padding:"clamp(20px,4vw,30px)"}}>
+        <div className="menu-board menu-board-animated" key={tab} style={{padding:"clamp(20px,4vw,30px)"}}>
           {tab==="burgers"&&(
             <>
               <MenuNote>Menu = + Frites + Sauce &nbsp;·&nbsp; Simple | Menu</MenuNote>
@@ -530,6 +560,11 @@ function StudentSection(){
         <SectionTitle dividerVariant="student" sub="Disponible du lundi au vendredi · Jours scolaires">Menu Étudiant</SectionTitle>
         <div className="student-layout">
           <div className="student-copy">
+            <div className="student-badge">
+              <span aria-hidden="true">★</span>
+              Menu étudiant
+            </div>
+            <h2 className="f-west">Le chef cowboy est devenu fou</h2>
             <p className="student-lead">
               Un burger menu ou un dürüm kebab, accompagné de frites et d’une canette offerte.
             </p>
@@ -557,6 +592,17 @@ function StudentSection(){
 }
 
 function GallerySection(){
+  const [selected,setSelected]=useState(null);
+
+  useEffect(()=>{
+    if(!selected)return undefined;
+    const onKey=(event)=>{
+      if(event.key==="Escape")setSelected(null);
+    };
+    document.addEventListener("keydown",onKey);
+    return()=>document.removeEventListener("keydown",onKey);
+  },[selected]);
+
   return(
     <section id="galerie" className="sp gallery-section western-atmosphere">
       <WesternBackdrop position="right center"/>
@@ -564,11 +610,25 @@ function GallerySection(){
         <SectionTitle sub="Burgers généreux, kebabs grillés et menus servis chez Chez Mus.">Galerie</SectionTitle>
         <div className="gallery-grid">
           {GALLERY.map((item,index)=>(
-            <figure key={item.alt} className={`gallery-card gallery-card-${index+1} reveal-card`} style={{animationDelay:`${index*70}ms`}}>
-              <img src={item.src} alt={item.alt} loading="lazy" style={{objectPosition:item.position}}/>
-            </figure>
+            <button
+              key={item.alt}
+              type="button"
+              className={`gallery-card gallery-card-${index+1} reveal-card`}
+              style={{animationDelay:`${index*70}ms`}}
+              onClick={()=>setSelected(item)}
+              aria-label={`Agrandir la photo : ${item.alt}`}
+            >
+              <img src={item.src} alt={item.alt} loading="lazy" sizes="(max-width: 640px) 50vw, (max-width: 1020px) 33vw, 25vw" style={{objectPosition:item.position}}/>
+            </button>
           ))}
         </div>
+        {selected&&(
+          <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label={selected.alt} onClick={()=>setSelected(null)}>
+            <button type="button" className="gallery-lightbox-close" onClick={()=>setSelected(null)} aria-label="Fermer la photo">×</button>
+            <img src={selected.src} alt={selected.alt} onClick={(event)=>event.stopPropagation()}/>
+            <p>{selected.alt}</p>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -579,7 +639,7 @@ function ReviewsSection(){
     <section className="sp reviews-section">
       <div className="inner">
         <div className="reviews-head">
-          <SectionTitle sub="Avis clients & ambiance locale">Ils parlent de Chez Mus</SectionTitle>
+          <SectionTitle sub="Avis clients & ambiance locale" decorative={false}>Ils parlent de Chez Mus</SectionTitle>
           <p>
             Une adresse de quartier doit donner envie avant même d’ouvrir la porte :
             du goût, du caractère et un accueil simple.
@@ -647,7 +707,7 @@ function Contact(){
   return(
     <section id="contact" className="sp contact-section">
       <div className="inner">
-        <SectionTitle>Nous Trouver</SectionTitle>
+        <SectionTitle decorative={false}>Nous Trouver</SectionTitle>
         <div className="contact-panel">
           <div className="contact-card">
             <div className="contact-mini-label">Le saloon est à Herstal</div>
@@ -736,11 +796,13 @@ export default function ChezMus(){
 html,body{width:100%;min-height:100%;overflow-x:hidden;}
 html{scroll-behavior:smooth;}
 body{min-width:320px;background:#E9D3A9;font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;color:#3D1A00;}
+body.menu-open{overflow:hidden;}
 #root,.App{width:100%;min-height:100%;max-width:none!important;margin:0!important;padding:0!important;border:none!important;background:#E9D3A9;}
 main,section,header,footer{width:100%;}
 section[id]{scroll-margin-top:92px;}
 img{max-width:100%;}
 a{text-decoration:none;}
+a:focus-visible,button:focus-visible{outline:3px solid rgba(232,112,10,.5);outline-offset:3px;}
 
 /* ── Typography ── */
 .f-west{font-family:'Rye',serif;}
@@ -871,6 +933,7 @@ a{text-decoration:none;}
 .quick-info-item div span{
   font-size:.86rem;font-weight:750;color:#F5EFE0;line-height:1.25;
 }
+.quick-info-item div span.is-secondary{color:rgba(245,239,224,.62);font-weight:650;}
 .quick-info-cta{
   display:flex;align-items:center;justify-content:center;gap:8px;padding:17px 22px;
   font-family:'Outfit',sans-serif;font-weight:850;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;
@@ -879,7 +942,6 @@ a{text-decoration:none;}
 .quick-info-cta:hover{background:#F17A10;}
 .quick-info-cta span{transition:transform 180ms cubic-bezier(.23,1,.32,1);}
 .quick-info-cta:hover span{transform:translateX(3px);}
-
 /* ── Student offer ── */
 .student-layout{
   display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);
@@ -894,11 +956,22 @@ a{text-decoration:none;}
   backdrop-filter:blur(2px);
 }
 .student-copy{max-width:500px;}
+.student-badge{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:13px;
+  font-family:'Outfit',sans-serif;font-size:.69rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;
+  color:#F5EFE0;background:#E8700A;border:1px solid rgba(83,37,15,.25);
+  border-radius:999px;padding:8px 11px;box-shadow:0 8px 18px rgba(87,30,3,.18);
+}
+.student-badge span{
+  display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;
+  color:#3D1A00;background:#F5EFE0;font-size:.68rem;
+  animation:sheriff-spin 5.6s linear infinite;
+}
 .student-kicker{
   font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;color:#C4924A;
   letter-spacing:.18em;text-transform:uppercase;margin-bottom:15px;
 }
-.student-copy h2{font-size:clamp(1.7rem,3.8vw,2.55rem);color:#F5EFE0;line-height:1.15;}
+.student-copy h2{font-size:clamp(1.85rem,4.2vw,3rem);color:#3D1A00;line-height:1.08;margin-bottom:16px;text-shadow:0 1px 0 rgba(255,246,222,.45);}
 .student-rule{width:54px;height:2px;background:#E8700A;margin:18px 0 24px;}
 .student-lead{font-family:'Outfit',sans-serif;font-size:1rem;color:#5A3520;line-height:1.72;margin-bottom:26px;}
 .student-offers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:23px;}
@@ -919,7 +992,7 @@ a{text-decoration:none;}
 
 /* ── Gallery ── */
 .gallery-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:220px;gap:16px;}
-.gallery-card{position:relative;overflow:hidden;border-radius:10px;border:1px solid rgba(83,37,15,.42);background:#E1C490;box-shadow:0 9px 26px rgba(61,26,0,.14),inset 0 0 0 2px rgba(255,235,198,.2);}
+.gallery-card{position:relative;overflow:hidden;border-radius:10px;border:1px solid rgba(83,37,15,.42);background:#E1C490;box-shadow:0 9px 26px rgba(61,26,0,.14),inset 0 0 0 2px rgba(255,235,198,.2);appearance:none;padding:0;text-align:inherit;cursor:pointer;}
 .gallery-card::after{content:"";position:absolute;inset:7px;border:1px solid rgba(255,232,188,.24);border-radius:6px;pointer-events:none;}
 .gallery-card img{width:100%;height:100%;display:block;object-fit:cover;transition:transform 420ms cubic-bezier(.22,1,.36,1),filter 300ms cubic-bezier(.22,1,.36,1);}
 .gallery-card:hover img{transform:scale(1.035);filter:saturate(1.08) contrast(1.02);}
@@ -928,6 +1001,31 @@ a{text-decoration:none;}
 .gallery-card-3{grid-column:span 4;grid-row:span 2;}
 .gallery-card-4,.gallery-card-5,.gallery-card-6{grid-column:span 4;grid-row:span 2;}
 .gallery-card-7,.gallery-card-8,.gallery-card-9,.gallery-card-10{grid-column:span 3;grid-row:span 2;}
+.gallery-lightbox{
+  position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:clamp(18px,5vw,52px);
+  background:rgba(16,5,0,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  animation:lightbox-in 180ms cubic-bezier(.22,1,.36,1) both;
+}
+.gallery-lightbox img{
+  max-width:min(980px,100%);max-height:78vh;object-fit:contain;border-radius:14px;
+  border:1px solid rgba(255,224,164,.28);box-shadow:0 30px 80px rgba(0,0,0,.42);
+}
+.gallery-lightbox p{
+  margin-top:14px;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;color:#F5EFE0;text-align:center;
+}
+.gallery-lightbox-close{
+  position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;
+  border:1px solid rgba(255,224,164,.36);background:#F5EFE0;color:#3D1A00;
+  font-size:1.5rem;line-height:1;cursor:pointer;
+}
+@keyframes lightbox-in{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+@keyframes sheriff-spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
 .trust-tag{background:rgba(255,244,218,.58);color:#3D1A00;border:1px solid rgba(91,43,19,.32);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);}
 
 /* ── Western surfaces ── */
@@ -1011,6 +1109,11 @@ a{text-decoration:none;}
 .map-fallback div:last-child{display:flex;flex-direction:column;gap:5px;}
 .map-fallback strong{font-family:'Outfit',sans-serif;font-size:1rem;}
 .map-fallback span{font-family:'Outfit',sans-serif;font-size:.78rem;color:rgba(245,239,224,.62);line-height:1.5;}
+.map-fallback a{
+  width:max-content;margin-top:6px;padding:8px 11px;border-radius:999px;
+  font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase;
+  color:#1B0B04;background:#E8700A;
+}
 
 /* ── Featured offer + reviews ── */
 .offer-section{
@@ -1150,20 +1253,41 @@ a{text-decoration:none;}
 .header-cta span{font-size:.95rem;line-height:1;transition:transform 180ms cubic-bezier(.23,1,.32,1);}
 .header-cta:hover span{transform:translateX(3px);}
 .hamburger{background:none;border:none;cursor:pointer;padding:4px 2px;display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
-.mobile-menu{background:#F5EFE0;border-top:1px solid rgba(196,146,74,.2);padding:18px clamp(20px,5vw,52px) 24px;box-shadow:0 14px 26px rgba(61,26,0,.12);}
-.mobile-link{display:block;font-family:'Outfit',sans-serif;font-weight:500;font-size:.95rem;color:#3D1A00;padding:12px 0;border-bottom:1px solid #EDE4CE;}
+.mobile-menu{position:fixed;inset:68px 0 0;z-index:190;display:grid;place-items:start center;padding:clamp(18px,5vw,28px);background:rgba(16,5,0,.48);opacity:0;visibility:hidden;pointer-events:none;transition:opacity 220ms cubic-bezier(.22,1,.36,1),visibility 220ms;}
+.mobile-menu.is-open{opacity:1;visibility:visible;pointer-events:auto;}
+.mobile-menu-doors{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;pointer-events:none;overflow:hidden;}
+.mobile-menu-doors span{background:linear-gradient(90deg,rgba(35,12,2,.28),transparent 22%,rgba(255,216,151,.08) 52%,rgba(35,12,2,.22)),repeating-linear-gradient(90deg,#4A1E0B 0,#4A1E0B 18px,#5C2912 19px,#5C2912 38px);box-shadow:inset 0 0 0 1px rgba(255,224,164,.1);transform:scaleX(1);transition:transform 420ms cubic-bezier(.18,.82,.22,1);}
+.mobile-menu-doors span:first-child{transform-origin:left center;}
+.mobile-menu-doors span:last-child{transform-origin:right center;}
+.mobile-menu.is-open .mobile-menu-doors span:first-child{transform:perspective(540px) rotateY(-64deg);}
+.mobile-menu.is-open .mobile-menu-doors span:last-child{transform:perspective(540px) rotateY(64deg);}
+.mobile-menu-panel{position:relative;z-index:2;width:min(100%,420px);padding:26px 22px 24px;background:linear-gradient(135deg,rgba(255,249,235,.95),rgba(231,198,143,.92)),repeating-linear-gradient(90deg,rgba(96,48,24,.03) 0 1px,transparent 1px 14px);border:1px solid rgba(61,26,0,.38);border-radius:18px;box-shadow:0 22px 64px rgba(16,5,0,.28),inset 0 0 0 1px rgba(255,255,255,.46);transform:translateY(10px) scale(.98);opacity:0;transition:transform 280ms 120ms cubic-bezier(.22,1,.36,1),opacity 220ms 120ms cubic-bezier(.22,1,.36,1);}
+.mobile-menu.is-open .mobile-menu-panel{transform:translateY(0) scale(1);opacity:1;}
+.mobile-menu-kicker{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:14px;font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#7A2F0B;}
+.mobile-menu-kicker svg{width:28px;height:14px;fill:#3D1A00;}
+.mobile-link{display:flex;align-items:center;justify-content:space-between;font-family:'Rye',serif;font-weight:400;font-size:clamp(1.35rem,8vw,2rem);color:#2A0E02;padding:13px 0;border-bottom:1px solid rgba(105,58,31,.18);opacity:0;transform:translateY(8px);transition:opacity 220ms cubic-bezier(.22,1,.36,1),transform 220ms cubic-bezier(.22,1,.36,1),color 180ms;}
+.mobile-menu.is-open .mobile-link{opacity:1;transform:translateY(0);}
+.mobile-link:hover{color:#E8700A;}
+.mobile-menu-actions{display:grid;gap:10px;margin-top:18px;}
+.mobile-menu-actions .btn-orange,.mobile-menu-actions .btn-outline-dark{justify-content:center;min-height:48px;}
+.mobile-menu-map{display:flex;justify-content:center;padding:10px 0;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6B3016;}
 
 /* ── Menu tabs ── */
-.tab-bar{display:flex;gap:0;width:100%;border-bottom:2px solid #D8C9A8;margin-bottom:28px;overflow-x:auto;scrollbar-width:none;}
+.tab-bar{display:flex;gap:8px;width:100%;border-bottom:1px solid rgba(105,58,31,.22);margin-bottom:28px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity;padding-bottom:8px;}
 .tab-bar::-webkit-scrollbar{display:none;}
 .tab{
   flex:0 0 auto;
-  font-family:'Outfit',sans-serif;font-weight:500;font-size:.825rem;letter-spacing:.04em;
-  padding:11px 18px;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;
-  background:transparent;cursor:pointer;color:#7A5235;transition:all .2s;
+  font-family:'Outfit',sans-serif;font-weight:800;font-size:.825rem;letter-spacing:.04em;
+  padding:10px 18px;border:1px solid rgba(105,58,31,.18);border-radius:999px;
+  background:rgba(255,249,235,.52);cursor:pointer;color:#7A5235;transition:all .2s;scroll-snap-align:start;
 }
-.tab.active{color:#3D1A00;font-weight:700;border-bottom-color:#E8700A;}
+.tab.active{color:#F5EFE0;font-weight:850;border-color:#E8700A;background:#3D1A00;box-shadow:0 8px 18px rgba(61,26,0,.12);}
 .tab:hover:not(.active){color:#3D1A00;}
+.menu-board-animated{animation:menu-tab-in 260ms cubic-bezier(.22,1,.36,1) both;}
+@keyframes menu-tab-in{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
 /* ── Cards grid ── */
 .western-atmosphere{
@@ -1365,6 +1489,9 @@ a{text-decoration:none;}
   .saloon-divider-revealed .saloon-mini-door-left{transform:translate3d(-1px,0,0) rotateY(-36deg);}
   .saloon-divider-revealed .saloon-mini-door-right{transform:translate3d(1px,0,0) rotateY(36deg);}
   .student-layout{padding:20px 16px;}
+  .student-copy h2{font-size:clamp(1.8rem,10vw,2.55rem);}
+  .student-lead{font-size:.92rem;line-height:1.62;margin-bottom:18px;}
+  .featured-card .featured-image{height:185px;}
   footer>div{justify-content:center!important;text-align:center;}
   .footer-address{flex-basis:100%;}
   .student-offers{grid-template-columns:1fr;}
@@ -1379,7 +1506,9 @@ a{text-decoration:none;}
 @media(prefers-reduced-motion:reduce){
   .saloon-mini-door,.saloon-divider-moustache,.nav-link,.nav-link::after,
   .btn-orange,.btn-orange::after,.btn-dark,.btn-dark::after,.btn-outline-dark,.btn-outline-dark::after,
-  .gallery-card img,.reveal-card{transition:none!important;animation:none!important;}
+  .gallery-card img,.reveal-card,.hero-food-scene,.hero-location,.hero-copy h1,.hero-description,
+  .hero-actions,.hero-student-link,.quick-info-section,.mobile-menu,.mobile-menu-panel,.mobile-menu-doors span,
+  .mobile-link,.menu-board-animated,.gallery-lightbox,.student-badge span{transition:none!important;animation:none!important;}
   .mobile-touch-moustache{animation:none!important;opacity:.7;transform:translate(-50%,-50%) scale(1)!important;}
 }
 @media(hover:none),(pointer:coarse){
@@ -1435,14 +1564,14 @@ a{text-decoration:none;}
   .map-shell,.mapbox-canvas,.map-fallback{min-height:360px;}
 }
 @media(max-width:560px){
-  .hero-shell{min-height:710px;}
+  .hero-shell{min-height:660px;}
   .hero-shell{border-bottom-width:6px;}
   .hero-shell::after{inset:8px;border-radius:12px;}
-  .hero-grid{padding:34px 20px 38px;}
-  .hero-copy h1{font-size:clamp(1.72rem,8.7vw,2.35rem);line-height:1.1;margin-bottom:16px;max-width:350px;}
+  .hero-grid{padding:30px 20px 34px;}
+  .hero-copy h1{font-size:clamp(1.68rem,8.25vw,2.22rem);line-height:1.08;margin-bottom:14px;max-width:350px;}
   .hero-location{font-size:.6rem;letter-spacing:.1em;gap:7px;margin-bottom:13px;white-space:nowrap;}
   .hero-moustache{width:22px;height:11px;}
-  .hero-description{max-width:345px;margin-bottom:18px;line-height:1.55;font-size:.91rem;}
+  .hero-description{max-width:345px;margin-bottom:16px;line-height:1.52;font-size:.89rem;}
   .hero-actions{align-items:stretch;gap:11px;margin-bottom:14px;}
   .hero-actions .btn-orange,.hero-actions .btn-outline-dark{
     justify-content:center;flex:1 1 145px;min-height:48px;padding:12px 14px;white-space:nowrap;
