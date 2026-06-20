@@ -1,15 +1,5 @@
-html {
-  min-width: 320px;
-  background: #f5efe0;
-}
-
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
-  background: #f5efe0;
-}
-
-#root {
-  min-height: 100vh;
-}
+html { min-width: 320px; scroll-behavior: smooth; background: #17100a; }
+body { min-width: 320px; min-height: 100vh; margin: 0; background: #17100a; }
+body.modal-open { overflow: hidden; }
+button, a { -webkit-tap-highlight-color: transparent; }
+#root { min-height: 100vh; }

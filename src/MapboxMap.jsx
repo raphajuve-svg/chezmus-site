@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const LOCATION = [5.62936, 50.66312];
+const ADDRESS_URL = "https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal";
+const INSTAGRAM_URL = "https://instagram.com/chezmusburger";
 
 export default function MapboxMap() {
   const containerRef = useRef(null);
@@ -10,7 +12,6 @@ export default function MapboxMap() {
 
   useEffect(() => {
     if (!token || !containerRef.current) return undefined;
-
     let map;
     let cancelled = false;
 
@@ -18,7 +19,6 @@ export default function MapboxMap() {
       try {
         const { default: mapboxgl } = await import("mapbox-gl");
         if (cancelled || !containerRef.current) return;
-
         mapboxgl.accessToken = token;
         map = new mapboxgl.Map({
           container: containerRef.current,
@@ -27,23 +27,15 @@ export default function MapboxMap() {
           zoom: 15.4,
           attributionControl: false,
         });
-
         map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
         map.addControl(new mapboxgl.AttributionControl({ compact: true }));
-
         const marker = document.createElement("div");
         marker.className = "chezmus-marker";
         marker.setAttribute("aria-label", "Chez Mus");
-
         new mapboxgl.Marker({ element: marker, anchor: "bottom" })
           .setLngLat(LOCATION)
-          .setPopup(
-            new mapboxgl.Popup({ offset: 24, closeButton: false }).setHTML(
-              "<strong>Chez Mus</strong><br>Rue Elisa Dumonceau 69",
-            ),
-          )
+          .setPopup(new mapboxgl.Popup({ offset: 24, closeButton: false }).setHTML("<strong>Chez Mus</strong><br>Rue Elisa Dumonceau 69"))
           .addTo(map);
-
         map.on("error", () => setFailed(true));
       } catch {
         setFailed(true);
@@ -51,19 +43,21 @@ export default function MapboxMap() {
     }
 
     createMap();
-    return () => {
-      cancelled = true;
-      map?.remove();
-    };
+    return () => { cancelled = true; map?.remove(); };
   }, [token]);
 
   if (!token || failed) {
     return (
       <div className="map-fallback">
-        <div className="map-fallback-pin" aria-hidden="true">★</div>
         <div>
-          <strong>Chez Mus · Herstal</strong>
-          <span>La carte interactive sera disponible prochainement.</span>
+          <small>Retrouvez-nous à Herstal</small>
+          <strong>Chez Mus</strong>
+          <address>Rue Elisa Dumonceau 69<br />4040 Herstal</address>
+          <span>Carte interactive bientôt disponible.</span>
+          <div className="map-fallback-actions">
+            <a href={ADDRESS_URL} target="_blank" rel="noreferrer">Itinéraire</a>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Nous contacter</a>
+          </div>
         </div>
       </div>
     );
