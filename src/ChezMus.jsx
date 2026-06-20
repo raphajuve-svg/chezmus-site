@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import logo from "./assets/chezmus-logo.jpg";
 import howdy from "./assets/howdy.jpg";
 import howdyCard from "./assets/howdy-card.jpg";
@@ -67,44 +67,114 @@ function ActionLink({ className = "", children, ...props }) {
 
 function Header({ onMenuOpen }) {
   const [open, setOpen] = useState(false);
-  const close = () => setOpen(false);
+  const menuButtonRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const brandRef = useRef(null);
+  const overlayRef = useRef(null);
+  const close = useCallback((restoreFocus = true) => {
+    setOpen(false);
+    if (restoreFocus) window.requestAnimationFrame(() => menuButtonRef.current?.focus({ preventScroll: true }));
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("nav-open", open);
-    return () => document.body.classList.remove("nav-open");
-  }, [open]);
+    if (!open) return () => document.body.classList.remove("nav-open");
+
+    closeButtonRef.current?.focus();
+    const backgroundElements = [document.querySelector("main"), document.querySelector(".site-footer"), ...document.querySelectorAll(".site-header > :not(.mobile-nav-overlay)")].filter(Boolean);
+    const previousAria = new Map(backgroundElements.map((element) => [element, element.getAttribute("aria-hidden")]));
+    backgroundElements.forEach((element) => { element.inert = true; element.setAttribute("aria-hidden", "true"); });
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        close();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = [...overlayRef.current.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    const desktopQuery = window.matchMedia("(min-width: 920px)");
+    const onDesktop = (event) => {
+      if (!event.matches) return;
+      close(false);
+      window.requestAnimationFrame(() => brandRef.current?.focus({ preventScroll: true }));
+    };
+    document.addEventListener("keydown", onKeyDown);
+    desktopQuery.addEventListener("change", onDesktop);
+
+    return () => {
+      document.body.classList.remove("nav-open");
+      backgroundElements.forEach((element) => {
+        element.inert = false;
+        const ariaValue = previousAria.get(element);
+        if (ariaValue === null) element.removeAttribute("aria-hidden");
+        else element.setAttribute("aria-hidden", ariaValue);
+      });
+      document.removeEventListener("keydown", onKeyDown);
+      desktopQuery.removeEventListener("change", onDesktop);
+    };
+  }, [open, close]);
 
   return (
     <header className="site-header">
       <nav className="desktop-nav desktop-nav-left" aria-label="Navigation principale">
         <a href="#accueil">Accueil</a><a href="#menu-complet">La carte</a><a href="#etudiant">Menu étudiant</a>
       </nav>
-      <a className="brand" href="#accueil" aria-label="Chez Mus, retour à l’accueil"><img src={logo} alt="Chez Mus Burger & Kebab" /></a>
+      <a ref={brandRef} className="brand" href="#accueil" aria-label="Chez Mus, retour à l’accueil"><img src={logo} alt="Chez Mus Burger & Kebab" /></a>
       <nav className="desktop-nav desktop-nav-right" aria-label="Navigation secondaire">
         <a href="#galerie">Galerie</a><a href="#esprit">L’esprit</a><a href="#contact">Contact</a>
       </nav>
       <button className="header-menu-button" type="button" onClick={onMenuOpen}>Voir le menu</button>
-      <button className="menu-word" type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Fermer la navigation" : "Ouvrir la navigation"}>
-        <span aria-hidden="true">{open ? "×" : "☰"}</span>
+      <button ref={menuButtonRef} className="menu-word" type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls="mobile-navigation-overlay" aria-haspopup="dialog" aria-label="Ouvrir la navigation">
+        <span aria-hidden="true">☰</span>
       </button>
       {open ? (
-        <nav className="mobile-nav" aria-label="Navigation mobile">
-          <div className="mobile-nav-head"><img src={logo} alt="" /><span>Chez Mus</span></div>
-          <a href="#accueil" onClick={close}>Accueil</a><a href="#menu-complet" onClick={close}>La carte</a><a href="#etudiant" onClick={close}>Menu étudiant</a><a href="#galerie" onClick={close}>Galerie</a><a href="#esprit" onClick={close}>L’esprit Chez Mus</a><a href="#contact" onClick={close}>Contact</a>
-          <button type="button" onClick={() => { close(); onMenuOpen(); }}>Voir la carte complète</button>
-        </nav>
+        <div ref={overlayRef} className="mobile-nav-overlay" id="mobile-navigation-overlay" role="dialog" aria-modal="true" aria-label="Navigation mobile">
+          <nav className="mobile-nav">
+            <div className="mobile-nav-head"><img src={logo} alt="Chez Mus" /><button ref={closeButtonRef} className="mobile-nav-close" type="button" onClick={() => close()} aria-label="Fermer la navigation">×</button></div>
+            <div className="mobile-nav-links"><a href="#accueil" onClick={() => close()}>Accueil</a><a href="#menu-complet" onClick={() => close()}>La carte</a><a href="#etudiant" onClick={() => close()}>Menu étudiant</a><a href="#galerie" onClick={() => close()}>Galerie</a><a href="#esprit" onClick={() => close()}>L’esprit Chez Mus</a><a href="#contact" onClick={() => close()}>Contact</a></div>
+            <button type="button" onClick={() => { close(); window.requestAnimationFrame(onMenuOpen); }}>Voir la carte complète</button>
+          </nav>
+        </div>
       ) : null}
     </header>
   );
 }
 
 function MenuSheet({ open, onClose }) {
+  const sheetRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   useEffect(() => {
     if (!open) return undefined;
-    const onKeyDown = (event) => event.key === "Escape" && onClose();
+    previousFocusRef.current = document.activeElement;
+    window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = [...sheetRef.current.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
     document.addEventListener("keydown", onKeyDown);
     document.body.classList.add("modal-open");
-    return () => { document.removeEventListener("keydown", onKeyDown); document.body.classList.remove("modal-open"); };
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.classList.remove("modal-open");
+      const previousFocus = previousFocusRef.current;
+      if (previousFocus?.isConnected) window.requestAnimationFrame(() => previousFocus.focus({ preventScroll: true }));
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -114,15 +184,15 @@ function MenuSheet({ open, onClose }) {
 
   return (
     <div className="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-title" onMouseDown={onClose}>
-      <div className="menu-sheet" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="menu-sheet-head"><div><p>Chez Mus · Herstal</p><h2 id="menu-title">La carte</h2></div><button type="button" onClick={onClose}>Fermer</button></div>
+      <div ref={sheetRef} className="menu-sheet" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="menu-sheet-head"><div><p>Chez Mus · Herstal</p><h2 id="menu-title">La carte</h2></div><button ref={closeButtonRef} type="button" onClick={onClose}>Fermer</button></div>
         <div className="menu-sheet-columns">
           <section><h2>Burgers</h2><ul>{renderItems(BURGERS)}</ul></section>
           <section><h2>Kebabs</h2><ul>{renderItems(KEBABS)}</ul></section>
           <section><h2>Formules</h2><div className="menu-note"><strong>Menu étudiant</strong><span>Burger menu ou dürüm kebab avec frites et canette offerte · Du lundi au vendredi, 12h—18h · Carte étudiante valide.</span></div><div className="menu-note"><strong>Menu Kido · 7,50 €</strong><span>Nuggets (4 pièces), petite frite, sauce et jus de fruit.</span></div></section>
           <section><h2>Extras</h2><ul className="extras-list">{EXTRAS.map(([name, price]) => <li key={name}><span>{name}</span><strong>{price}</strong></li>)}</ul></section>
         </div>
-        <div className="menu-sheet-footer"><p>Merci de signaler toute allergie avant de passer commande.</p><ActionLink href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Commander sur Instagram</ActionLink></div>
+        <div className="menu-sheet-footer"><p>Merci de signaler toute allergie avant de passer commande.</p></div>
       </div>
     </div>
   );
@@ -139,10 +209,10 @@ function Hero({ onMenuOpen }) {
         <p className="location-line">★ Herstal · 100% halal · Since 2026 ★</p>
         <h1><span>Des burgers généreux et</span><span>des kebabs grillés</span><span>à Herstal.</span></h1>
         <p className="hero-intro">Le saloon burger-kebab de Herstal : des recettes maison, des portions franches et un vrai caractère Chez Mus.</p>
-        <div className="hero-buttons"><button className="primary-button" type="button" onClick={onMenuOpen}>Voir la carte</button><ActionLink className="secondary-link" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Commander</ActionLink></div>
+        <div className="hero-buttons"><button className="primary-button" type="button" onClick={onMenuOpen}>Voir la carte</button><button className="action-link secondary-link" type="button" onClick={onMenuOpen}>Commander</button></div>
         <a className="hero-student-link" href="#etudiant">Découvrir le menu étudiant</a>
       </div>
-      <div className="hero-art"><img src="/assets/western-generated/hero-food-cutout.webp" alt="Burger, deux dürüm kebabs et frites Chez Mus" /></div>
+      <div className="hero-art"><img src="/assets/western-generated/hero-food-cutout-clean.webp" alt="Burger, deux dürüm kebabs et frites Chez Mus" /></div>
       <div className="hero-info" aria-label="Informations pratiques">
         <div><b aria-hidden="true">⌖</b><small>Adresse</small><strong>Rue Elisa Dumonceau 69</strong><span>4040 Herstal</span></div>
         <div><b aria-hidden="true">◷</b><small>Horaires</small><strong>Bientôt disponibles</strong><span>Suivez-nous pour les infos</span></div>
@@ -157,8 +227,6 @@ function Hero({ onMenuOpen }) {
 function FeaturedMenu() {
   return (
     <section className="featured-section" id="carte">
-      <img className="section-star section-star-left" src="/assets/western-generated/sheriff-star-ornament.webp" alt="" aria-hidden="true" />
-      <img className="section-star section-star-right" src="/assets/western-generated/sheriff-star-ornament.webp" alt="" aria-hidden="true" />
       <div className="western-heading"><p>Les classiques qui font revenir</p><h2>Nos incontournables</h2></div>
       <div className="product-grid">
         {FEATURED.map((item) => (
@@ -198,45 +266,38 @@ function AccordionGroup({ groupId, title, meta, open, onToggle, children }) {
         {meta ? <small>{meta}</small> : null}
         <span className="accordion-indicator" aria-hidden="true">{open ? "−" : "+"}</span>
       </button>
-      <div className="accordion-panel" id={panelId} role="region" aria-labelledby={buttonId} aria-hidden={!open}>
+      <div className="accordion-panel" id={panelId} role="region" aria-labelledby={buttonId} aria-hidden={!open} inert={!open}>
         <div className="accordion-panel-inner"><div className="accordion-panel-content">{children}</div></div>
       </div>
     </section>
   );
 }
 
-function FullMenu() {
-  const [openGroups, setOpenGroups] = useState(() => new Set(["burgers"]));
-  const toggleGroup = (groupId) => {
-    setOpenGroups((current) => {
-      const next = new Set(current);
-      if (next.has(groupId)) next.delete(groupId);
-      else next.add(groupId);
-      return next;
-    });
-  };
+function FullMenu({ onMenuOpen }) {
+  const [openGroup, setOpenGroup] = useState("burgers");
+  const toggleGroup = (groupId) => setOpenGroup((current) => current === groupId ? null : groupId);
 
   return (
     <section className="full-menu-section" id="menu-complet">
       <div className="western-heading"><p>Tout le goût Chez Mus</p><h2>La carte</h2></div>
       <p className="full-menu-intro">Ouvrez une catégorie pour découvrir tous les produits et leurs prix.</p>
       <div className="full-menu-board">
-        <AccordionGroup groupId="burgers" title="Burgers" meta="Simple · Menu" open={openGroups.has("burgers")} onToggle={toggleGroup}>
+        <AccordionGroup groupId="burgers" title="Burgers" meta="Simple · Menu" open={openGroup === "burgers"} onToggle={toggleGroup}>
           <ul className="full-menu-burger-list">{BURGERS.map((item) => <MenuRow item={item} key={item[0]} />)}</ul>
           <p className="full-menu-note">Menu = frites + sauce</p>
         </AccordionGroup>
-        <AccordionGroup groupId="kebabs" title="Kebabs" meta="Medium · Large" open={openGroups.has("kebabs")} onToggle={toggleGroup}>
+        <AccordionGroup groupId="kebabs" title="Kebabs" meta="Medium · Large" open={openGroup === "kebabs"} onToggle={toggleGroup}>
           <ul>{KEBABS.map((item) => <MenuRow item={item} labels={["Medium", "Large"]} key={item[0]} />)}</ul>
         </AccordionGroup>
-        <AccordionGroup groupId="menus" title="Menus" open={openGroups.has("menus")} onToggle={toggleGroup}>
+        <AccordionGroup groupId="menus" title="Menus" open={openGroup === "menus"} onToggle={toggleGroup}>
           <div className="menu-special"><div><h3>Menu étudiant</h3><p>Burger menu ou dürüm kebab avec frites et canette offerte.</p></div><small>Du lundi au vendredi · 12h—18h · Carte étudiante valide</small></div>
           <div className="menu-special"><div><h3>Menu Kido</h3><p>Nuggets (4 pièces), petite frite, sauce et jus de fruit.</p></div><strong>7,50 €</strong></div>
         </AccordionGroup>
-        <AccordionGroup groupId="extras" title="Extras" open={openGroups.has("extras")} onToggle={toggleGroup}>
+        <AccordionGroup groupId="extras" title="Extras" open={openGroup === "extras"} onToggle={toggleGroup}>
           <ul className="extras-list">{EXTRAS.map(([name, price]) => <li key={name}><span>{name}</span><strong>{price}</strong></li>)}</ul>
         </AccordionGroup>
       </div>
-      <ActionLink className="full-menu-cta" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Commander sur Instagram</ActionLink>
+      <button className="action-link full-menu-cta" type="button" onClick={onMenuOpen}>Commander</button>
     </section>
   );
 }
@@ -259,8 +320,6 @@ function GalleryStory() {
       <div className="gallery-grid">{GALLERY.map((item, index) => <figure key={`${item.alt}-${index}`}><img src={item.src} alt={item.alt} style={{ objectPosition: item.position }} /></figure>)}</div>
       <ActionLink className="gallery-button" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Voir toute la galerie</ActionLink>
       <div className="story-panel" id="esprit">
-        <img className="story-star story-star-left" src="/assets/western-generated/sheriff-star-ornament.webp" alt="" aria-hidden="true" />
-        <img className="story-star story-star-right" src="/assets/western-generated/sheriff-star-ornament.webp" alt="" aria-hidden="true" />
         <div className="story-copy"><p>L’esprit Chez Mus</p><h2>Plus qu’un restaurant, une identité.</h2><p>Chez Mus, c’est l’alliance du goût, de la générosité et d’un accueil chaleureux. Des produits frais, des recettes maison et une cuisine pensée pour rassembler.</p><ActionLink className="story-button" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Découvrir notre histoire</ActionLink></div>
         <div className="story-rider" aria-hidden="true"><img src="/assets/western-generated/rider-desert.webp" alt="" /></div>
         <div className="story-contact" id="contact"><p>Contactez-nous</p><h2>On est là pour vous.</h2><address><span><b aria-hidden="true">⌖</b>Rue Elisa Dumonceau 69<br />4040 Herstal</span><span><b aria-hidden="true">☎</b>Bientôt disponible</span><a href={EMAIL_URL}><b aria-hidden="true">✉</b>contact@chezmus.be</a></address><div className="social-links"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram">IG</a><a href={EMAIL_URL} aria-label="E-mail">@</a></div></div>
@@ -269,11 +328,11 @@ function GalleryStory() {
   );
 }
 
-function Footer() {
+function Footer({ onMenuOpen }) {
   return (
     <footer className="site-footer">
       <div className="footer-stars" aria-hidden="true">★</div>
-      <div className="footer-callout"><div><span>Une faim de cowboy ?</span><strong>Choisis ton menu. On s’occupe du reste.</strong></div><div className="footer-callout-actions"><ActionLink href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Commander</ActionLink><ActionLink className="footer-outline-link" href={ADDRESS_URL} target="_blank" rel="noreferrer">Nous trouver</ActionLink></div></div>
+      <div className="footer-callout"><div><span>Une faim de cowboy ?</span><strong>Choisis ton menu. On s’occupe du reste.</strong></div><div className="footer-callout-actions"><button className="action-link" type="button" onClick={onMenuOpen}>Commander</button><ActionLink className="footer-outline-link" href={ADDRESS_URL} target="_blank" rel="noreferrer">Nous trouver</ActionLink></div></div>
       <div className="footer-proof"><img src={logo} alt="Chez Mus" /><strong>★ Herstal · 100% halal · Since 2026 ★</strong></div>
       <div className="footer-meta"><p>© 2026 Chez Mus — Tous droits réservés.</p><div className="footer-links"><a href="#mentions-legales" id="mentions-legales">Mentions légales</a><a href="#confidentialite" id="confidentialite">Politique de confidentialité</a><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Retour en haut</button></div></div>
     </footer>
@@ -282,5 +341,7 @@ function Footer() {
 
 export default function ChezMus() {
   const [menuOpen, setMenuOpen] = useState(false);
-  return <div className="chezmus-site"><Header onMenuOpen={() => setMenuOpen(true)} /><main><Hero onMenuOpen={() => setMenuOpen(true)} /><FeaturedMenu /><FullMenu /><StudentOffer /><GalleryStory /></main><Footer /><MenuSheet open={menuOpen} onClose={() => setMenuOpen(false)} /></div>;
+  const openMenu = useCallback(() => setMenuOpen(true), []);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  return <div className="chezmus-site"><Header onMenuOpen={openMenu} /><main><Hero onMenuOpen={openMenu} /><FeaturedMenu /><FullMenu onMenuOpen={openMenu} /><StudentOffer /><GalleryStory /></main><Footer onMenuOpen={openMenu} /><MenuSheet open={menuOpen} onClose={closeMenu} /></div>;
 }
