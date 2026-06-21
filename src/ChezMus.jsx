@@ -65,23 +65,85 @@ function ActionLink({ className = "", children, ...props }) {
   return <a className={`action-link ${className}`} {...props}>{children}</a>;
 }
 
+function useScrollReveals() {
+  useEffect(() => {
+    const targets = [...document.querySelectorAll("[data-reveal]")];
+    if (!targets.length) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      targets.forEach((target) => target.classList.add("is-revealed"));
+      return undefined;
+    }
+
+    targets.forEach((target) => target.classList.add("reveal-pending"));
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-revealed");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -10%" });
+
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, []);
+}
+
 function Header({ onMenuOpen }) {
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const menuButtonRef = useRef(null);
   const closeButtonRef = useRef(null);
   const brandRef = useRef(null);
   const overlayRef = useRef(null);
-  const close = useCallback((restoreFocus = true) => {
-    setOpen(false);
-    if (restoreFocus) window.requestAnimationFrame(() => menuButtonRef.current?.focus({ preventScroll: true }));
+  const closeTimerRef = useRef(null);
+  const navStateRef = useRef({ open: false, closing: false });
+  const restoreFocusRef = useRef(false);
+  const afterCloseRef = useRef(null);
+  const modalActive = open || closing;
+
+  const finishClose = useCallback(() => {
+    if (overlayRef.current?.contains(document.activeElement)) document.activeElement.blur();
+    navStateRef.current = { open: false, closing: false };
+    setClosing(false);
+    const afterClose = afterCloseRef.current;
+    afterCloseRef.current = null;
+    if (afterClose) afterClose();
   }, []);
 
-  useEffect(() => {
-    document.body.classList.toggle("nav-open", open);
-    if (!open) return () => document.body.classList.remove("nav-open");
+  const openNav = useCallback(() => {
+    window.clearTimeout(closeTimerRef.current);
+    navStateRef.current = { open: true, closing: false };
+    setClosing(false);
+    setOpen(true);
+  }, []);
 
-    closeButtonRef.current?.focus();
-    const backgroundElements = [document.querySelector("main"), document.querySelector(".site-footer"), ...document.querySelectorAll(".site-header > :not(.mobile-nav-overlay)")].filter(Boolean);
+  const close = useCallback((restoreFocus = true, afterClose = null) => {
+    if (!navStateRef.current.open) return;
+    restoreFocusRef.current = restoreFocus;
+    afterCloseRef.current = afterClose;
+    navStateRef.current = { open: false, closing: true };
+    setOpen(false);
+    setClosing(true);
+    window.clearTimeout(closeTimerRef.current);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    closeTimerRef.current = window.setTimeout(finishClose, reducedMotion ? 0 : 320);
+  }, [finishClose]);
+
+  useEffect(() => () => window.clearTimeout(closeTimerRef.current), []);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    closeButtonRef.current?.focus({ preventScroll: true });
+    return undefined;
+  }, [open]);
+
+  useEffect(() => {
+    document.body.classList.toggle("nav-open", modalActive);
+    if (!modalActive) return () => document.body.classList.remove("nav-open");
+
+    const backgroundElements = [document.querySelector(".site-header"), document.querySelector("main"), document.querySelector(".site-footer")].filter(Boolean);
     const previousAria = new Map(backgroundElements.map((element) => [element, element.getAttribute("aria-hidden")]));
     backgroundElements.forEach((element) => { element.inert = true; element.setAttribute("aria-hidden", "true"); });
 
@@ -92,7 +154,9 @@ function Header({ onMenuOpen }) {
       }
       if (event.key !== "Tab") return;
 
-      const focusable = [...overlayRef.current.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      const overlay = overlayRef.current;
+      if (!overlay) return;
+      const focusable = [...overlay.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
       const first = focusable[0];
       const last = focusable.at(-1);
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
@@ -101,7 +165,12 @@ function Header({ onMenuOpen }) {
     const desktopQuery = window.matchMedia("(min-width: 920px)");
     const onDesktop = (event) => {
       if (!event.matches) return;
-      close(false);
+      window.clearTimeout(closeTimerRef.current);
+      afterCloseRef.current = null;
+      restoreFocusRef.current = false;
+      navStateRef.current = { open: false, closing: false };
+      setOpen(false);
+      setClosing(false);
       window.requestAnimationFrame(() => brandRef.current?.focus({ preventScroll: true }));
     };
     document.addEventListener("keydown", onKeyDown);
@@ -118,50 +187,89 @@ function Header({ onMenuOpen }) {
       document.removeEventListener("keydown", onKeyDown);
       desktopQuery.removeEventListener("change", onDesktop);
     };
-  }, [open, close]);
+  }, [modalActive, close]);
+
+  useEffect(() => {
+    if (modalActive || !restoreFocusRef.current) return undefined;
+    restoreFocusRef.current = false;
+    const frame = window.requestAnimationFrame(() => menuButtonRef.current?.focus({ preventScroll: true }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [modalActive]);
 
   return (
-    <header className="site-header">
-      <nav className="desktop-nav desktop-nav-left" aria-label="Navigation principale">
-        <a href="#accueil">Accueil</a><a href="#menu-complet">La carte</a><a href="#etudiant">Menu étudiant</a>
-      </nav>
-      <a ref={brandRef} className="brand" href="#accueil" aria-label="Chez Mus, retour à l’accueil"><img src={logo} alt="Chez Mus Burger & Kebab" /></a>
-      <nav className="desktop-nav desktop-nav-right" aria-label="Navigation secondaire">
-        <a href="#galerie">Galerie</a><a href="#esprit">L’esprit</a><a href="#contact">Contact</a>
-      </nav>
-      <button className="header-menu-button" type="button" onClick={onMenuOpen}>Voir le menu</button>
-      <button ref={menuButtonRef} className="menu-word" type="button" onClick={() => setOpen(true)} aria-expanded={open} aria-controls="mobile-navigation-overlay" aria-haspopup="dialog" aria-label="Ouvrir la navigation">
-        <span aria-hidden="true">☰</span>
-      </button>
-      {open ? (
-        <div ref={overlayRef} className="mobile-nav-overlay" id="mobile-navigation-overlay" role="dialog" aria-modal="true" aria-label="Navigation mobile">
+    <>
+      <header className="site-header">
+        <nav className="desktop-nav desktop-nav-left" aria-label="Navigation principale">
+          <a href="#accueil">Accueil</a><a href="#menu-complet">La carte</a><a href="#etudiant">Menu étudiant</a>
+        </nav>
+        <a ref={brandRef} className="brand" href="#accueil" aria-label="Chez Mus, retour à l’accueil"><img src={logo} alt="Chez Mus Burger & Kebab" /></a>
+        <nav className="desktop-nav desktop-nav-right" aria-label="Navigation secondaire">
+          <a href="#galerie">Galerie</a><a href="#esprit">L’esprit</a><a href="#contact">Contact</a>
+        </nav>
+        <button className="header-menu-button" type="button" onClick={onMenuOpen}>Voir le menu</button>
+        <button ref={menuButtonRef} className="menu-word" type="button" onClick={openNav} aria-expanded={open} aria-controls="mobile-navigation-overlay" aria-haspopup="dialog" aria-label="Ouvrir la navigation">
+          <span aria-hidden="true">☰</span>
+        </button>
+      </header>
+      <div ref={overlayRef} className={`mobile-nav-overlay${open ? " is-open" : closing ? " is-closing" : ""}`} id="mobile-navigation-overlay" role="dialog" aria-modal={modalActive ? "true" : undefined} aria-hidden={!modalActive} aria-label="Navigation mobile" inert={!modalActive} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
           <nav className="mobile-nav">
             <div className="mobile-nav-head"><img src={logo} alt="Chez Mus" /><button ref={closeButtonRef} className="mobile-nav-close" type="button" onClick={() => close()} aria-label="Fermer la navigation">×</button></div>
-            <div className="mobile-nav-links"><a href="#accueil" onClick={() => close()}>Accueil</a><a href="#menu-complet" onClick={() => close()}>La carte</a><a href="#etudiant" onClick={() => close()}>Menu étudiant</a><a href="#galerie" onClick={() => close()}>Galerie</a><a href="#esprit" onClick={() => close()}>L’esprit Chez Mus</a><a href="#contact" onClick={() => close()}>Contact</a></div>
-            <button type="button" onClick={() => { close(); window.requestAnimationFrame(onMenuOpen); }}>Voir la carte complète</button>
+            <div className="mobile-nav-links"><a href="#accueil" onClick={() => close(false)}>Accueil</a><a href="#menu-complet" onClick={() => close(false)}>La carte</a><a href="#etudiant" onClick={() => close(false)}>Menu étudiant</a><a href="#galerie" onClick={() => close(false)}>Galerie</a><a href="#esprit" onClick={() => close(false)}>L’esprit Chez Mus</a><a href="#contact" onClick={() => close(false)}>Contact</a></div>
+            <button type="button" onClick={() => close(false, onMenuOpen)}>Voir la carte complète</button>
           </nav>
-        </div>
-      ) : null}
-    </header>
+      </div>
+    </>
   );
 }
 
 function MenuSheet({ open, onClose }) {
+  const [closing, setClosing] = useState(false);
   const sheetRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previousFocusRef = useRef(null);
+  const closeTimerRef = useRef(null);
+  const modalActiveRef = useRef(false);
+  const modalActive = open || closing;
+  const requestClose = useCallback(() => {
+    setClosing(true);
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
-    if (!open) return undefined;
-    previousFocusRef.current = document.activeElement;
-    window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+    window.clearTimeout(closeTimerRef.current);
+    if (open) {
+      if (!modalActiveRef.current) previousFocusRef.current = document.activeElement;
+      modalActiveRef.current = true;
+      closeButtonRef.current?.focus({ preventScroll: true });
+      return undefined;
+    }
+    if (!modalActiveRef.current) return undefined;
+    setClosing(true);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    closeTimerRef.current = window.setTimeout(() => {
+      if (sheetRef.current?.contains(document.activeElement)) document.activeElement.blur();
+      modalActiveRef.current = false;
+      setClosing(false);
+    }, reducedMotion ? 0 : 320);
+    return undefined;
+  }, [open]);
+
+  useEffect(() => () => window.clearTimeout(closeTimerRef.current), []);
+
+  useEffect(() => {
+    if (!modalActive) return undefined;
+    const backgroundElements = [document.querySelector(".site-header"), document.querySelector("main"), document.querySelector(".site-footer")].filter(Boolean);
+    const previousAria = new Map(backgroundElements.map((element) => [element, element.getAttribute("aria-hidden")]));
+    backgroundElements.forEach((element) => { element.inert = true; element.setAttribute("aria-hidden", "true"); });
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
-        onClose();
+        requestClose();
         return;
       }
       if (event.key !== "Tab") return;
-      const focusable = [...sheetRef.current.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      const sheet = sheetRef.current;
+      if (!sheet) return;
+      const focusable = [...sheet.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')];
       const first = focusable[0];
       const last = focusable.at(-1);
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
@@ -172,20 +280,25 @@ function MenuSheet({ open, onClose }) {
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.classList.remove("modal-open");
+      backgroundElements.forEach((element) => {
+        element.inert = false;
+        const ariaValue = previousAria.get(element);
+        if (ariaValue === null) element.removeAttribute("aria-hidden");
+        else element.setAttribute("aria-hidden", ariaValue);
+      });
       const previousFocus = previousFocusRef.current;
       if (previousFocus?.isConnected) window.requestAnimationFrame(() => previousFocus.focus({ preventScroll: true }));
     };
-  }, [open, onClose]);
+  }, [modalActive, requestClose]);
 
-  if (!open) return null;
   const renderItems = (items) => items.map(([name, description, solo, menu]) => (
     <li className="menu-sheet-item" key={name}><div><h3>{name}</h3><p>{description}</p></div><div className="menu-prices"><span><small>Solo</small>{solo}</span><span><small>Menu</small>{menu}</span></div></li>
   ));
 
   return (
-    <div className="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-title" onMouseDown={onClose}>
+    <div className={`menu-modal${open ? " is-open" : closing ? " is-closing" : ""}`} role="dialog" aria-modal={modalActive ? "true" : undefined} aria-hidden={!modalActive} aria-labelledby="menu-title" inert={!modalActive} onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose(); }}>
       <div ref={sheetRef} className="menu-sheet" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="menu-sheet-head"><div><p>Chez Mus · Herstal</p><h2 id="menu-title">La carte</h2></div><button ref={closeButtonRef} type="button" onClick={onClose}>Fermer</button></div>
+        <div className="menu-sheet-head"><div><p>Chez Mus · Herstal</p><h2 id="menu-title">La carte</h2></div><button ref={closeButtonRef} type="button" onClick={requestClose}>Fermer</button></div>
         <div className="menu-sheet-columns">
           <section><h2>Burgers</h2><ul>{renderItems(BURGERS)}</ul></section>
           <section><h2>Kebabs</h2><ul>{renderItems(KEBABS)}</ul></section>
@@ -212,7 +325,7 @@ function Hero({ onMenuOpen }) {
         <div className="hero-buttons"><button className="primary-button" type="button" onClick={onMenuOpen}>Voir la carte</button><button className="action-link secondary-link" type="button" onClick={onMenuOpen}>Commander</button></div>
         <a className="hero-student-link" href="#etudiant">Découvrir le menu étudiant</a>
       </div>
-      <div className="hero-art"><img src="/assets/western-generated/hero-food-cutout-clean.webp" alt="Burger, deux dürüm kebabs et frites Chez Mus" /></div>
+      <div className="hero-art" data-reveal><img src="/assets/western-generated/hero-food-cutout-clean.webp" alt="Burger, deux dürüm kebabs et frites Chez Mus" /></div>
       <div className="hero-info" aria-label="Informations pratiques">
         <div><b aria-hidden="true">⌖</b><small>Adresse</small><strong>Rue Elisa Dumonceau 69</strong><span>4040 Herstal</span></div>
         <div><b aria-hidden="true">◷</b><small>Horaires</small><strong>Bientôt disponibles</strong><span>Suivez-nous pour les infos</span></div>
@@ -228,7 +341,7 @@ function FeaturedMenu() {
   return (
     <section className="featured-section" id="carte">
       <div className="western-heading"><p>Les classiques qui font revenir</p><h2>Nos incontournables</h2></div>
-      <div className="product-grid">
+      <div className="product-grid" data-reveal>
         {FEATURED.map((item) => (
           <article className="product-card" key={item.name}>
             <div className="product-photo"><img src={item.image} alt={`${item.name} Chez Mus`} style={{ objectPosition: item.position }} /></div>
@@ -305,7 +418,7 @@ function FullMenu({ onMenuOpen }) {
 function StudentOffer() {
   return (
     <section className="student-section" id="etudiant">
-      <div className="student-poster">
+      <div className="student-poster" data-reveal>
         <div className="student-copy"><p>Menu étudiant</p><h2>Le chef cowboy est devenu fou&nbsp;!</h2><p className="student-description">Une formule généreuse pensée pour les vraies pauses entre les cours.</p><div className="student-offer-line"><strong>Canette offerte</strong><span>Avec un burger menu ou un dürüm kebab accompagné de frites</span></div><dl><div><dt>Quand</dt><dd>Du lundi au vendredi</dd></div><div><dt>Heures</dt><dd>12h — 18h</dd></div><div><dt>Condition</dt><dd>Carte étudiante valide</dd></div></dl><ActionLink href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Découvrir le menu étudiant</ActionLink></div>
         <div className="student-photo"><img src={studentMenu} alt="Menu étudiant Chez Mus avec burger, frites et canette" /><div className="student-badge" aria-hidden="true"><span>Menu</span><strong>étudiant</strong></div></div>
       </div>
@@ -317,11 +430,11 @@ function GalleryStory() {
   return (
     <section className="gallery-story" id="galerie">
       <div className="western-heading western-heading-light"><p>Du grill à l’assiette</p><h2>Galerie</h2></div>
-      <div className="gallery-grid">{GALLERY.map((item, index) => <figure key={`${item.alt}-${index}`}><img src={item.src} alt={item.alt} style={{ objectPosition: item.position }} /></figure>)}</div>
+      <div className="gallery-grid" data-reveal>{GALLERY.map((item, index) => <figure key={`${item.alt}-${index}`}><img src={item.src} alt={item.alt} style={{ objectPosition: item.position }} /></figure>)}</div>
       <ActionLink className="gallery-button" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Voir toute la galerie</ActionLink>
       <div className="story-panel" id="esprit">
         <div className="story-copy"><p>L’esprit Chez Mus</p><h2>Plus qu’un restaurant, une identité.</h2><p>Chez Mus, c’est l’alliance du goût, de la générosité et d’un accueil chaleureux. Des produits frais, des recettes maison et une cuisine pensée pour rassembler.</p><ActionLink className="story-button" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Découvrir notre histoire</ActionLink></div>
-        <div className="story-rider" aria-hidden="true"><img src="/assets/western-generated/rider-desert.webp" alt="" /></div>
+        <div className="story-rider" data-reveal aria-hidden="true"><img src="/assets/western-generated/rider-desert.webp" alt="" /></div>
         <div className="story-contact" id="contact"><p>Contactez-nous</p><h2>On est là pour vous.</h2><address><span><b aria-hidden="true">⌖</b>Rue Elisa Dumonceau 69<br />4040 Herstal</span><span><b aria-hidden="true">☎</b>Bientôt disponible</span><a href={EMAIL_URL}><b aria-hidden="true">✉</b>contact@chezmus.be</a></address><div className="social-links"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram">IG</a><a href={EMAIL_URL} aria-label="E-mail">@</a></div></div>
       </div>
     </section>
@@ -331,7 +444,6 @@ function GalleryStory() {
 function Footer({ onMenuOpen }) {
   return (
     <footer className="site-footer">
-      <div className="footer-stars" aria-hidden="true">★</div>
       <div className="footer-callout"><div><span>Une faim de cowboy ?</span><strong>Choisis ton menu. On s’occupe du reste.</strong></div><div className="footer-callout-actions"><button className="action-link" type="button" onClick={onMenuOpen}>Commander</button><ActionLink className="footer-outline-link" href={ADDRESS_URL} target="_blank" rel="noreferrer">Nous trouver</ActionLink></div></div>
       <div className="footer-proof"><img src={logo} alt="Chez Mus" /><strong>★ Herstal · 100% halal · Since 2026 ★</strong></div>
       <div className="footer-meta"><p>© 2026 Chez Mus — Tous droits réservés.</p><div className="footer-links"><a href="#mentions-legales" id="mentions-legales">Mentions légales</a><a href="#confidentialite" id="confidentialite">Politique de confidentialité</a><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Retour en haut</button></div></div>
@@ -340,6 +452,7 @@ function Footer({ onMenuOpen }) {
 }
 
 export default function ChezMus() {
+  useScrollReveals();
   const [menuOpen, setMenuOpen] = useState(false);
   const openMenu = useCallback(() => setMenuOpen(true), []);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
