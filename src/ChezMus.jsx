@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import logo from "./assets/chezmus-logo.jpg";
 import howdy from "./assets/howdy.jpg";
-import howdyCard from "./assets/howdy-card.jpg";
 import dermano from "./assets/le dermano.png";
-import dermanoCard from "./assets/dermano-card.jpg";
 import buffalo from "./assets/buffalo.png";
-import buffaloCard from "./assets/buffalo-card.jpg";
 import adana from "./assets/Kebab_adana.jpg";
 import studentMenu from "./assets/MENU étudiant.jpg";
 import burgerChezMus from "./assets/Le burger Chez Mus.jpg";
@@ -45,20 +42,20 @@ const EXTRAS = [
 ];
 
 const FEATURED = [
-  { name: "Le Howdy", category: "Burger", description: "Steak de bœuf, cheddar, cornichons et oignons caramélisés.", price: "7,50 €", image: howdyCard, position: "50% 67%" },
-  { name: "Le Dermano", category: "Burger", description: "Sauce BBQ, cheddar, bacon, aubergine grillée et oignons.", price: "8,50 €", image: dermanoCard, position: "50% 68%" },
-  { name: "Le Buffalo", category: "Double steak", description: "BBQ, cheddar, bacon, cornichons et oignons caramélisés.", price: "9,50 €", image: buffaloCard, position: "50% 66%" },
-  { name: "Adana", category: "Kebab grillé", description: "Hachis de bœuf piquant, crudités et cuisson minute.", price: "9 €", image: heroFood, position: "16% 68%" },
+  { name: "Le Howdy", category: "Burger", description: "Steak de bœuf, cheddar, cornichons et oignons caramélisés.", price: "7,50 €", image: howdy, position: "50% 57%" },
+  { name: "Le Dermano", category: "Burger", description: "Sauce BBQ, cheddar, bacon, aubergine grillée et oignons.", price: "8,50 €", image: dermano, position: "50% 55%" },
+  { name: "Le Buffalo", category: "Double steak", description: "BBQ, cheddar, bacon, cornichons et oignons caramélisés.", price: "9,50 €", image: buffalo, position: "50% 55%" },
+  { name: "Adana", category: "Kebab grillé", description: "Hachis de bœuf piquant, crudités et cuisson minute.", price: "9 €", image: adana, position: "50% 52%" },
 ];
 
 const GALLERY = [
-  { src: heroFood, alt: "Burger, dürüm kebab et frites Chez Mus", position: "58% 66%" },
-  { src: dermano, alt: "Burger Dermano devant Chez Mus", position: "50% 64%" },
-  { src: buffalo, alt: "Burger Buffalo Chez Mus", position: "50% 65%" },
-  { src: howdy, alt: "Burger Howdy Chez Mus", position: "50% 66%" },
-  { src: adana, alt: "Kebab Adana en préparation", position: "50% 61%" },
-  { src: burgerChezMus, alt: "Burger Chez Mus", position: "50% 58%" },
-  { src: dermanoCard, alt: "Détail du burger Dermano", position: "50% 67%" },
+  { src: heroFood, alt: "Burger, dürüm kebab et frites Chez Mus", position: "58% 58%" },
+  { src: howdy, alt: "Burger Howdy Chez Mus", position: "50% 57%" },
+  { src: dermano, alt: "Burger Dermano devant Chez Mus", position: "50% 55%" },
+  { src: buffalo, alt: "Burger Buffalo Chez Mus", position: "50% 55%" },
+  { src: adana, alt: "Kebab Adana en préparation", position: "50% 52%" },
+  { src: burgerChezMus, alt: "Burger Chez Mus", position: "50% 56%" },
+  { src: studentMenu, alt: "Menu étudiant Chez Mus avec burger, frites et canette", position: "50% 52%" },
 ];
 
 function ActionLink({ className = "", children, ...props }) {
@@ -319,17 +316,17 @@ function Hero({ onMenuOpen }) {
         <img src="/assets/western-generated/hero-western-backdrop-desktop.webp" alt="" />
       </picture>
       <div className="hero-copy">
-        <p className="location-line">★ Herstal · 100% halal · Since 2026 ★</p>
+        <p className="location-line">★ Herstal · 100% halal · Depuis 2026 ★</p>
         <h1><span>Des burgers généreux et</span><span>des kebabs grillés</span><span>à Herstal.</span></h1>
         <p className="hero-intro">Le saloon burger-kebab de Herstal : des recettes maison, des portions franches et un vrai caractère Chez Mus.</p>
-        <div className="hero-buttons"><button className="primary-button" type="button" onClick={onMenuOpen}>Voir la carte</button><button className="action-link secondary-link" type="button" onClick={onMenuOpen}>Commander</button></div>
+        <div className="hero-buttons"><button className="primary-button" type="button" onClick={onMenuOpen}>Voir la carte</button><ActionLink className="secondary-link" href={ADDRESS_URL} target="_blank" rel="noreferrer">Nous trouver</ActionLink></div>
         <a className="hero-student-link" href="#etudiant">Découvrir le menu étudiant</a>
       </div>
       <div className="hero-art" data-reveal><img src="/assets/western-generated/hero-food-cutout-clean.webp" alt="Burger, deux dürüm kebabs et frites Chez Mus" /></div>
       <div className="hero-info" aria-label="Informations pratiques">
         <div><b aria-hidden="true">⌖</b><small>Adresse</small><strong>Rue Elisa Dumonceau 69</strong><span>4040 Herstal</span></div>
-        <div><b aria-hidden="true">◷</b><small>Horaires</small><strong>Bientôt disponibles</strong><span>Suivez-nous pour les infos</span></div>
-        <div><b aria-hidden="true">☎</b><small>Téléphone</small><strong>Bientôt disponible</strong><span>Contact via Instagram</span></div>
+        <div><b aria-hidden="true">◷</b><small>Horaires</small><strong>À confirmer</strong><span>Suivez-nous sur Instagram</span></div>
+        <div><b aria-hidden="true">☎</b><small>Contact</small><strong>Instagram</strong><span>Infos et actualités</span></div>
         <div><b aria-hidden="true">▣</b><small>Service</small><strong>Sur place</strong><span>Et à emporter</span></div>
         <a href={ADDRESS_URL} target="_blank" rel="noreferrer">Itinéraire</a>
       </div>
@@ -410,7 +407,7 @@ function FullMenu({ onMenuOpen }) {
           <ul className="extras-list">{EXTRAS.map(([name, price]) => <li key={name}><span>{name}</span><strong>{price}</strong></li>)}</ul>
         </AccordionGroup>
       </div>
-      <button className="action-link full-menu-cta" type="button" onClick={onMenuOpen}>Commander</button>
+      <button className="action-link full-menu-cta" type="button" onClick={onMenuOpen}>Voir la carte complète</button>
     </section>
   );
 }
@@ -435,7 +432,7 @@ function GalleryStory() {
       <div className="story-panel" id="esprit">
         <div className="story-copy"><p>L’esprit Chez Mus</p><h2>Plus qu’un restaurant, une identité.</h2><p>Chez Mus, c’est l’alliance du goût, de la générosité et d’un accueil chaleureux. Des produits frais, des recettes maison et une cuisine pensée pour rassembler.</p><ActionLink className="story-button" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">Découvrir notre histoire</ActionLink></div>
         <div className="story-rider" data-reveal aria-hidden="true"><img src="/assets/western-generated/rider-desert.webp" alt="" /></div>
-        <div className="story-contact" id="contact"><p>Contactez-nous</p><h2>On est là pour vous.</h2><address><span><b aria-hidden="true">⌖</b>Rue Elisa Dumonceau 69<br />4040 Herstal</span><span><b aria-hidden="true">☎</b>Bientôt disponible</span><a href={EMAIL_URL}><b aria-hidden="true">✉</b>contact@chezmus.be</a></address><div className="social-links"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram">IG</a><a href={EMAIL_URL} aria-label="E-mail">@</a></div></div>
+        <div className="story-contact" id="contact"><p>Contactez-nous</p><h2>On est là pour vous.</h2><address><span><b aria-hidden="true">⌖</b>Rue Elisa Dumonceau 69<br />4040 Herstal</span><span><b aria-hidden="true">◷</b>Horaires à confirmer sur Instagram</span><a href={EMAIL_URL}><b aria-hidden="true">✉</b>contact@chezmus.be</a></address><div className="social-links"><a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram">IG</a><a href={EMAIL_URL} aria-label="E-mail">@</a></div></div>
       </div>
     </section>
   );
@@ -444,8 +441,8 @@ function GalleryStory() {
 function Footer({ onMenuOpen }) {
   return (
     <footer className="site-footer">
-      <div className="footer-callout"><div><span>Une faim de cowboy ?</span><strong>Choisis ton menu. On s’occupe du reste.</strong></div><div className="footer-callout-actions"><button className="action-link" type="button" onClick={onMenuOpen}>Commander</button><ActionLink className="footer-outline-link" href={ADDRESS_URL} target="_blank" rel="noreferrer">Nous trouver</ActionLink></div></div>
-      <div className="footer-proof"><img src={logo} alt="Chez Mus" /><strong>★ Herstal · 100% halal · Since 2026 ★</strong></div>
+      <div className="footer-callout"><div><span>Une faim de cowboy ?</span><strong>Choisis ton menu. On s’occupe du reste.</strong></div><div className="footer-callout-actions"><button className="action-link" type="button" onClick={onMenuOpen}>Voir la carte</button><ActionLink className="footer-outline-link" href={ADDRESS_URL} target="_blank" rel="noreferrer">Nous trouver</ActionLink></div></div>
+      <div className="footer-proof"><img src={logo} alt="Chez Mus" /><strong>★ Herstal · 100% halal · Depuis 2026 ★</strong></div>
       <div className="footer-meta"><p>© 2026 Chez Mus — Tous droits réservés.</p><div className="footer-links"><a href="#mentions-legales" id="mentions-legales">Mentions légales</a><a href="#confidentialite" id="confidentialite">Politique de confidentialité</a><button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Retour en haut</button></div></div>
     </footer>
   );
