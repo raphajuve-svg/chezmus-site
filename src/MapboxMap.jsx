@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const LOCATION = [5.62936, 50.66312];
+const MAPS_URL = "https://maps.google.com/?q=Rue+Elisa+Dumonceau+69+4040+Herstal";
 
 export default function MapboxMap() {
   const containerRef = useRef(null);
@@ -59,13 +60,19 @@ export default function MapboxMap() {
 
   if (!token || failed) {
     return (
-      <div className="map-fallback">
-        <div className="map-fallback-pin" aria-hidden="true">★</div>
-        <div>
+      <a
+        className="map-fallback"
+        href={MAPS_URL}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Ouvrir l’itinéraire Google Maps vers Chez Mus"
+      >
+        <span className="map-fallback-pin" aria-hidden="true">★</span>
+        <span>
           <strong>Chez Mus · Herstal</strong>
-          <span>La carte interactive sera disponible prochainement.</span>
-        </div>
-      </div>
+          <span>Rue Elisa Dumonceau 69 · Ouvrir l’itinéraire</span>
+        </span>
+      </a>
     );
   }
 
