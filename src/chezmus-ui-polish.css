@@ -1,0 +1,327 @@
+:root {
+  --chez-cream: #f5efe0;
+  --chez-paper: #fbf7ee;
+  --chez-sand: #ede4ce;
+  --chez-brown: #3d1a00;
+  --chez-dark: #100500;
+  --chez-mid: #6b4226;
+  --chez-light: #7a5235;
+  --chez-orange: #e8700a;
+  --chez-wood: #c4924a;
+  --chez-border: #d8c9a8;
+}
+
+/* Hero: stronger first impression, cleaner food integration */
+body .hero-shell {
+  min-height: clamp(640px, calc(100vh - 64px), 820px) !important;
+  background: linear-gradient(135deg, #e2b77b 0%, #c99058 100%) !important;
+  border-bottom: 10px solid var(--chez-brown) !important;
+}
+
+body .hero-shell::after {
+  inset: 18px !important;
+  border-color: rgba(61, 26, 0, 0.42) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(245, 239, 224, 0.32),
+    0 24px 80px rgba(61, 26, 0, 0.18) !important;
+}
+
+body .hero-food-scene {
+  background-size: auto 105% !important;
+  background-position: right 48% center !important;
+  filter: saturate(1.04) contrast(1.02) !important;
+}
+
+body .hero-scene-wash {
+  background:
+    radial-gradient(circle at 80% 52%, rgba(61, 26, 0, 0.08) 0%, transparent 34%),
+    linear-gradient(90deg, rgba(230, 190, 132, 0.98) 0%, rgba(229, 187, 128, 0.96) 33%, rgba(221, 175, 113, 0.82) 46%, rgba(201, 148, 91, 0.36) 61%, rgba(61, 26, 0, 0.04) 82%),
+    linear-gradient(180deg, rgba(245, 239, 224, 0.14) 0%, transparent 50%, rgba(40, 15, 2, 0.3) 100%) !important;
+}
+
+body .hero-grid {
+  padding-top: clamp(86px, 8vw, 118px) !important;
+  padding-bottom: clamp(58px, 7vw, 96px) !important;
+}
+
+body .hero-copy {
+  width: min(50%, 610px) !important;
+}
+
+body .hero-location {
+  background: rgba(251, 247, 238, 0.38) !important;
+  border: 1px solid rgba(61, 26, 0, 0.16) !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  padding: 8px 13px !important;
+  margin-bottom: 24px !important;
+}
+
+body .hero-copy h1 {
+  text-wrap: balance !important;
+  letter-spacing: -0.02em !important;
+  max-width: 620px !important;
+}
+
+body .hero-description {
+  max-width: 520px !important;
+  font-weight: 550 !important;
+}
+
+body .hero-student-link {
+  background: rgba(251, 247, 238, 0.55) !important;
+  border: 1px solid rgba(61, 26, 0, 0.22) !important;
+  border-radius: 999px !important;
+  padding: 10px 15px !important;
+  box-shadow: 0 8px 22px rgba(61, 26, 0, 0.08) !important;
+}
+
+/* Section atmosphere: keep the western identity, reduce visual noise */
+body .western-section-bg {
+  opacity: 0.42 !important;
+  filter: saturate(0.88) sepia(0.12) contrast(0.95) !important;
+}
+
+body .western-section-overlay {
+  background:
+    linear-gradient(180deg, rgba(244, 224, 184, 0.5), rgba(244, 224, 184, 0.42)),
+    rgba(244, 224, 184, 0.2) !important;
+}
+
+/* Menu tabs: clearer active state and a stronger student hook */
+body .tab-bar {
+  border-bottom: 0 !important;
+  background: rgba(251, 247, 238, 0.62) !important;
+  border: 1px solid rgba(216, 201, 168, 0.9) !important;
+  border-radius: 12px !important;
+  padding: 5px !important;
+  gap: 4px !important;
+}
+
+body .tab {
+  border: 0 !important;
+  margin-bottom: 0 !important;
+  border-radius: 9px !important;
+  padding: 12px 18px !important;
+  min-height: 44px !important;
+}
+
+body .tab.active {
+  background: var(--chez-brown) !important;
+  color: var(--chez-cream) !important;
+  box-shadow: 0 8px 20px rgba(61, 26, 0, 0.16) !important;
+}
+
+body .tab:nth-child(3):not(.active) {
+  color: #a54812 !important;
+  font-weight: 750 !important;
+}
+
+body .tab:nth-child(3)::after {
+  content: " ★";
+  color: var(--chez-orange);
+}
+
+body .tab:nth-child(3).active::after {
+  color: var(--chez-wood);
+}
+
+/* Student offer: make it feel like a real conversion block */
+body .student-layout {
+  grid-template-columns: minmax(0, 0.88fr) minmax(380px, 1.12fr) !important;
+  gap: clamp(28px, 5vw, 66px) !important;
+  background:
+    linear-gradient(135deg, rgba(251, 247, 238, 0.9), rgba(245, 239, 224, 0.72)) !important;
+  border: 1px solid rgba(105, 58, 31, 0.32) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 60px rgba(61, 26, 0, 0.16) !important;
+}
+
+body .student-lead {
+  font-size: clamp(1.05rem, 1.35vw, 1.18rem) !important;
+  line-height: 1.7 !important;
+  color: #4c2a17 !important;
+}
+
+body .student-offer-card {
+  padding: 20px 20px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 250, 239, 0.88) !important;
+  box-shadow: 0 8px 22px rgba(61, 26, 0, 0.06) !important;
+}
+
+body .student-offer-card div {
+  font-size: 1rem !important;
+}
+
+body .student-details span {
+  background: rgba(61, 26, 0, 0.06) !important;
+  border-color: rgba(61, 26, 0, 0.18) !important;
+  font-weight: 700 !important;
+}
+
+body .student-photo-wrap {
+  padding: 12px !important;
+  border-radius: 16px !important;
+  background: rgba(255, 250, 239, 0.72) !important;
+  box-shadow: 0 18px 46px rgba(61, 26, 0, 0.16) !important;
+}
+
+body .student-photo {
+  height: clamp(340px, 39vw, 500px) !important;
+  border-radius: 11px !important;
+  object-position: center 52% !important;
+}
+
+/* Featured/gallery: slightly more premium cards without making them cute */
+body .fg > div,
+body .gallery-card,
+body .contact-panel {
+  border-radius: 14px !important;
+}
+
+body .featured-image {
+  background: #e7dcc3 !important;
+}
+
+/* Contact: clearer trust and action */
+body .contact-panel {
+  min-height: 450px !important;
+  box-shadow: 0 18px 48px rgba(61, 26, 0, 0.12) !important;
+}
+
+body .contact-card {
+  align-self: stretch !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+body .hours-note {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+body .hours-note::after {
+  content: "Horaires à confirmer sur Instagram";
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--chez-light);
+  letter-spacing: 0.035em;
+}
+
+body .contact-card a[href*="instagram"] {
+  justify-content: center !important;
+  font-size: 0.84rem !important;
+  font-weight: 750 !important;
+}
+
+body .map-fallback {
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+body .map-fallback:hover .map-fallback-pin {
+  transform: translateY(-2px) rotate(-6deg) !important;
+}
+
+body .map-fallback-pin {
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+@media (max-width: 979px) {
+  body .hero-shell {
+    min-height: auto !important;
+  }
+
+  body .hero-grid {
+    padding-top: 58px !important;
+    padding-bottom: 30px !important;
+  }
+
+  body .hero-copy {
+    width: min(100%, 680px) !important;
+  }
+
+  body .hero-food-scene {
+    height: min(62vw, 540px) !important;
+    background-size: cover !important;
+    background-position: 58% center !important;
+  }
+
+  body .hero-scene-wash {
+    background:
+      linear-gradient(180deg, rgba(224, 182, 122, 0.98) 0%, rgba(224, 182, 122, 0.82) 16%, rgba(224, 182, 122, 0.08) 42%, transparent 72%, rgba(42, 14, 2, 0.36) 100%) !important;
+  }
+
+  body .student-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body .hero-shell::after {
+    inset: 9px !important;
+  }
+
+  body .hero-grid {
+    padding: 44px 20px 28px !important;
+  }
+
+  body .hero-location {
+    display: inline-flex !important;
+    max-width: 100% !important;
+    line-height: 1.35 !important;
+  }
+
+  body .hero-actions .btn-orange,
+  body .hero-actions .btn-outline-dark {
+    flex: 1 1 100% !important;
+    min-height: 50px !important;
+  }
+
+  body .hero-student-link {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 2px !important;
+  }
+
+  body .hero-food-scene {
+    height: 300px !important;
+    background-position: 59% center !important;
+  }
+
+  body .tab-bar {
+    padding: 4px !important;
+    gap: 3px !important;
+  }
+
+  body .tab {
+    padding: 11px 12px !important;
+    font-size: 0.76rem !important;
+  }
+
+  body .student-layout {
+    padding: 20px 16px !important;
+    border-radius: 15px !important;
+  }
+
+  body .student-photo {
+    height: 310px !important;
+  }
+
+  body .contact-card {
+    padding: 30px 22px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  body .tab {
+    padding-inline: 9px !important;
+    font-size: 0.72rem !important;
+  }
+
+  body .tab:nth-child(3)::after {
+    content: "";
+  }
+}
